@@ -1,10 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import {
   motion,
   AnimatePresence,
   useInView,
+  useMotionValue,
+  useSpring,
+  useTransform,
   Variants,
 } from 'framer-motion';
 
@@ -18,6 +22,8 @@ const CARDS = [
     desc: 'МОПс — собственное производство. Полный цикл от проекта до сдачи объекта.',
     tag: 'Госзаказы',
     gradient: 'linear-gradient(135deg, #2a3018, #4a5a28)',
+    image:
+      'https://pub-b1e3de631e544c69b0ad6587f740e140.r2.dev/%D0%9C%D0%9E%D0%9F%D0%A1.jpg',
     icon: (
       <svg
         width="16"
@@ -40,6 +46,8 @@ const CARDS = [
     desc: 'Премиальные оздоровительные пространства. Кейс — отель History, Иркутск.',
     tag: 'Премиум',
     gradient: 'linear-gradient(135deg, #1a2a2a, #2a4a4a)',
+    image:
+      'https://pub-b1e3de631e544c69b0ad6587f740e140.r2.dev/%D0%A1%D0%9F%D0%90.jpg',
     icon: (
       <svg
         width="16"
@@ -62,6 +70,8 @@ const CARDS = [
     desc: 'Любая технология под ваш бюджет: каркас, кирпич, металлокаркас, брус.',
     tag: 'Под бюджет',
     gradient: 'linear-gradient(135deg, #1a1818, #3a2a1a)',
+    image:
+      'https://pub-b1e3de631e544c69b0ad6587f740e140.r2.dev/%D0%96%D0%B8%D0%BB%D0%BE%D0%B9.jpg',
     icon: (
       <svg
         width="16"
@@ -101,6 +111,158 @@ const MODAL_TITLES: Record<ModalKey, string> = {
   spa: 'SPA и банные комплексы',
   residential: 'Жилые комплексы',
 };
+
+type Card = (typeof CARDS)[number];
+
+function DirectionCard({
+  card,
+  index,
+  isInView,
+  onOpen,
+}: {
+  card: Card;
+  index: number;
+  isInView: boolean;
+  onOpen: () => void;
+}) {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const photoX = useSpring(useTransform(mouseX, [-1, 1], [-8, 8]), {
+    stiffness: 150,
+    damping: 20,
+  });
+  const photoY = useSpring(useTransform(mouseY, [-1, 1], [-8, 8]), {
+    stiffness: 150,
+    damping: 20,
+  });
+  const photoScale = useMotionValue(1);
+  const photoScaleSpring = useSpring(photoScale, {
+    stiffness: 150,
+    damping: 20,
+  });
+
+  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-4, 4]), {
+    stiffness: 200,
+    damping: 25,
+  });
+  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [4, -4]), {
+    stiffness: 200,
+    damping: 25,
+  });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    mouseX.set(x);
+    mouseY.set(y);
+    photoScale.set(1.06);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+    photoScale.set(1);
+  };
+
+  return (
+    <motion.div
+      data-cursor="card"
+      variants={cardVariants[card.key]}
+      initial="hidden"
+      animate={isInView ? 'visible' : 'hidden'}
+      transition={{
+        duration: 0.65,
+        delay: index * 0.1,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: 'preserve-3d',
+      }}
+      className="bg-white border border-[#E0DFDA] rounded-[16px] overflow-hidden cursor-pointer flex flex-col h-full min-h-[380px]"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={onOpen}
+    >
+      <div
+        className="relative flex-1 min-h-[200px] overflow-hidden"
+        style={{ background: card.gradient }}
+      >
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            x: photoX,
+            y: photoY,
+            scale: photoScaleSpring,
+          }}
+        >
+          <Image
+            src={card.image}
+            alt={card.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
+          />
+        </motion.div>
+
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%)',
+          }}
+        />
+
+        <div className="relative z-[1] flex flex-col justify-between h-full p-5">
+          <div className="flex justify-end">
+            <div
+              className="w-7 h-7 flex items-center justify-center rounded-[8px]"
+              style={{
+                background: 'rgba(255,255,255,0.10)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+              }}
+            >
+              {card.icon}
+            </div>
+          </div>
+
+          <p className="font-sans text-[9px] tracking-[0.2em] text-white/70">
+            {card.number}
+          </p>
+        </div>
+      </div>
+
+      <div className="p-[14px_14px_16px]">
+        <h3 className="font-serif text-[17px] text-[#1C1C1C] leading-tight mb-2">
+          {card.title}
+        </h3>
+
+        <p className="font-sans text-[11px] text-[#6B6B6B] leading-relaxed mb-4">
+          {card.desc}
+        </p>
+
+        <div className="flex items-center justify-between">
+          <span
+            className="font-sans text-[10px] tracking-[0.1em] uppercase px-2.5 py-1 rounded-full"
+            style={{
+              background: 'rgba(42,92,26,0.08)',
+              color: '#2A5C1A',
+            }}
+          >
+            {card.tag}
+          </span>
+
+          <span className="text-[#6B6B6B] text-base">→</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 function ModalContent({
   modalKey,
@@ -368,67 +530,16 @@ export default function DirectionsSection() {
         <div
           ref={sectionRef}
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
+          style={{ perspective: '1000px' }}
         >
           {CARDS.map((card, index) => (
-            <motion.div
+            <DirectionCard
               key={card.key}
-              variants={cardVariants[card.key]}
-              initial="hidden"
-              animate={isInView ? 'visible' : 'hidden'}
-              transition={{
-                duration: 0.65,
-                delay: index * 0.1,
-                ease: [0.25, 0.46, 0.45, 0.94],
-              }}
-              className="bg-white border border-[#E0DFDA] rounded-[16px] overflow-hidden cursor-pointer flex flex-col h-full min-h-[380px]"
-              whileHover={{ y: -3 }}
-              onClick={() => setOpenModal(card.key)}
-            >
-              <div
-                className="relative flex-1 min-h-[200px] flex flex-col justify-between p-5"
-                style={{ background: card.gradient }}
-              >
-                <div className="flex justify-end">
-                  <div
-                    className="w-7 h-7 flex items-center justify-center rounded-[8px]"
-                    style={{
-                      background: 'rgba(255,255,255,0.10)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                    }}
-                  >
-                    {card.icon}
-                  </div>
-                </div>
-
-                <p className="font-sans text-[9px] tracking-[0.2em] text-white/40">
-                  {card.number}
-                </p>
-              </div>
-
-              <div className="p-[14px_14px_16px]">
-                <h3 className="font-serif text-[17px] text-[#1C1C1C] leading-tight mb-2">
-                  {card.title}
-                </h3>
-
-                <p className="font-sans text-[11px] text-[#6B6B6B] leading-relaxed mb-4">
-                  {card.desc}
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <span
-                    className="font-sans text-[10px] tracking-[0.1em] uppercase px-2.5 py-1 rounded-full"
-                    style={{
-                      background: 'rgba(42,92,26,0.08)',
-                      color: '#2A5C1A',
-                    }}
-                  >
-                    {card.tag}
-                  </span>
-
-                  <span className="text-[#6B6B6B] text-base">→</span>
-                </div>
-              </div>
-            </motion.div>
+              card={card}
+              index={index}
+              isInView={isInView}
+              onOpen={() => setOpenModal(card.key)}
+            />
           ))}
         </div>
       </div>
