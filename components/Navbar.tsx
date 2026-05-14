@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 const NAV_LINKS = [
@@ -12,6 +12,10 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [pillStyle, setPillStyle] = useState({ left: 0, width: 0 });
+  const navRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const ulRef = useRef<HTMLUListElement | null>(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 80);
@@ -37,12 +41,26 @@ export default function Navbar() {
         margin: '12px 16px',
       };
 
+  const handleNavClick = (i: number) => {
+    const el = navRefs.current[i];
+    const parent = ulRef.current;
+    if (el && parent) {
+      const parentRect = parent.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      setPillStyle({
+        left: elRect.left - parentRect.left - 8,
+        width: elRect.width + 16,
+      });
+    }
+    setActiveIndex(i);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
       <div className="transition-all duration-300" style={glassStyle}>
         <div className="flex items-center justify-between h-14 px-4 md:px-6">
           {/* Logo */}
-          <a href="#" className="flex-shrink-0">
+          <a href="#" className="flex items-center gap-2 flex-shrink-0">
             <Image
               src="/images/logo.svg"
               alt="ClickHome"
@@ -53,15 +71,43 @@ export default function Navbar() {
               }`}
               priority
             />
+            <span className={`font-sans font-medium text-[15px] tracking-tight transition-colors duration-300 ${
+              scrolled ? 'text-[#1C1C1C]' : 'text-white'
+            }`}>
+              Click<span className="font-light">home</span>
+            </span>
           </a>
 
           {/* Desktop nav */}
-          <ul className="hidden md:flex items-center gap-6">
+          <ul ref={ulRef} className="hidden md:flex items-center gap-6 relative">
+            {/* Animated pill */}
+            {activeIndex !== null && (
+              <div
+                className="absolute pointer-events-none rounded-[20px]"
+                style={{
+                  left: pillStyle.left,
+                  width: pillStyle.width,
+                  height: '28px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: scrolled ? 'rgba(42,92,26,0.08)' : 'rgba(255,255,255,0.15)',
+                  border: scrolled
+                    ? '0.5px solid rgba(42,92,26,0.2)'
+                    : '0.5px solid rgba(255,255,255,0.25)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  transition: 'all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+                }}
+              />
+            )}
+
             {NAV_LINKS.map((link, i) => (
               <li key={i}>
                 <a
+                  ref={el => { navRefs.current[i] = el; }}
                   href={link.href}
-                  className={`font-sans text-[12px] tracking-wide transition-colors duration-200 ${
+                  onClick={() => handleNavClick(i)}
+                  className={`font-sans text-[12px] tracking-wide transition-colors duration-200 relative z-10 ${
                     scrolled
                       ? 'text-[#1C1C1C] hover:text-[#2A5C1A]'
                       : 'text-white/85 hover:text-white'
