@@ -1,12 +1,35 @@
 'use client';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useCountUp } from '@/hooks/useCountUp';
 
-const STATS = [
-  { value: '2017', label: 'Год основания' },
-  { value: '40+', label: 'Реализованных объектов' },
-  { value: '3', label: 'Направления строительства' },
-  { value: 'По всей России', label: 'География' },
+type Stat =
+  | { kind: 'number'; from: number; to: number; suffix?: string; label: string }
+  | { kind: 'text'; text: string; label: string };
+
+const STATS: Stat[] = [
+  { kind: 'number', from: 2010, to: 2017, label: 'Год основания' },
+  { kind: 'number', from: 0, to: 40, suffix: '+', label: 'Реализованных объектов' },
+  { kind: 'number', from: 0, to: 3, label: 'Направления строительства' },
+  { kind: 'text', text: 'По всей России', label: 'География' },
 ];
+
+function AnimatedNumber({
+  from,
+  to,
+  suffix,
+}: {
+  from: number;
+  to: number;
+  suffix?: string;
+}) {
+  const [value, ref] = useCountUp(from, to, 1800);
+  return (
+    <span ref={ref}>
+      {Math.round(value)}
+      {suffix ?? ''}
+    </span>
+  );
+}
 
 export default function HeroVideo() {
   const { scrollY } = useScroll();
@@ -77,7 +100,25 @@ export default function HeroVideo() {
                 i < STATS.length - 1 ? 'md:border-r md:border-white/10' : ''
               } md:pr-8`}
             >
-              <p className="font-serif text-3xl text-white leading-none">{stat.value}</p>
+              {stat.kind === 'number' ? (
+                <p className="font-serif text-3xl text-white leading-none">
+                  <AnimatedNumber
+                    from={stat.from}
+                    to={stat.to}
+                    suffix={stat.suffix}
+                  />
+                </p>
+              ) : (
+                <motion.p
+                  className="font-serif text-3xl text-white leading-none"
+                  initial={{ opacity: 0, y: 8 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-10% 0px' }}
+                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                >
+                  {stat.text}
+                </motion.p>
+              )}
               <p className="font-sans text-[9px] uppercase tracking-[0.1em] text-white/40 mt-1">
                 {stat.label}
               </p>
