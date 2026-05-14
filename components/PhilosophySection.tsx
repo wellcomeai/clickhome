@@ -1,6 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import RevealText from './RevealText';
+import ParticleCanvas from './ParticleCanvas';
 
 const PRINCIPLES = [
   'Инженерная точность',
@@ -13,9 +14,12 @@ export default function PhilosophySection() {
   return (
     <section
       id="about"
-      className="relative z-20 bg-[#111110] py-24 px-6 md:px-12 lg:px-20"
+      className="relative z-20 bg-[#111110] py-24 px-6 md:px-12 lg:px-20 overflow-hidden"
     >
-      <div className="max-w-content mx-auto">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <ParticleCanvas />
+      </div>
+      <div className="relative max-w-content mx-auto">
         <p className="font-sans text-[11px] tracking-[0.25em] uppercase text-white/40 mb-16">
           Философия
         </p>
