@@ -1,6 +1,10 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useCountUp } from '@/hooks/useCountUp';
+import { scrambleText } from '@/lib/textScramble';
+
+const HEADING_LINES = ['Строим', 'спокойно.', 'Потому что', 'умеем.'];
 
 type Stat =
   | { kind: 'number'; from: number; to: number; suffix?: string; label: string }
@@ -33,6 +37,33 @@ function AnimatedNumber({
 
 export default function HeroVideo() {
   const { scrollY } = useScroll();
+  const [displayedLines, setDisplayedLines] = useState<string[]>(
+    HEADING_LINES.map(() => '')
+  );
+
+  useEffect(() => {
+    const cancels: Array<() => void> = [];
+    const timeouts: Array<ReturnType<typeof setTimeout>> = [];
+
+    HEADING_LINES.forEach((line, i) => {
+      const t = setTimeout(() => {
+        const cancel = scrambleText(line, (out) => {
+          setDisplayedLines((prev) => {
+            const next = [...prev];
+            next[i] = out;
+            return next;
+          });
+        }, 1200);
+        cancels.push(cancel);
+      }, 600 + i * 200);
+      timeouts.push(t);
+    });
+
+    return () => {
+      timeouts.forEach(clearTimeout);
+      cancels.forEach((c) => c());
+    };
+  }, []);
 
   const clipPath = useTransform(
     scrollY,
@@ -66,13 +97,11 @@ export default function HeroVideo() {
           Инженерия будущего
         </p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-6">
-          Строим
-          <br />
-          спокойно.
-          <br />
-          Потому что
-          <br />
-          умеем.
+          {HEADING_LINES.map((_, i) => (
+            <span key={i} className="block min-h-[1.05em]">
+              {displayedLines[i] || ' '}
+            </span>
+          ))}
         </h1>
         <p className="font-sans text-base md:text-lg text-white/75 mb-8 max-w-md">
           Архитектурные и модульные решения
