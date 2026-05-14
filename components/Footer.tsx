@@ -54,7 +54,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="font-sans text-xs text-white/30">
-            © 2025 ClickHome. Все права защищены.
+            © {new Date().getFullYear()} ClickHome. Все права защищены.
           </p>
           <p className="font-sans text-xs text-white/20">
             40+ объектов по всей России

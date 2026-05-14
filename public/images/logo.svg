@@ -5,5 +5,5 @@
   <rect x="20" y="25" width="6" height="15" rx="1" fill="#2A5C1A"/>
   <rect x="20" y="17" width="6" height="8" rx="1" fill="#2A5C1A"/>
   <!-- Wordmark -->
-  <text x="34" y="30" font-size="17" font-family="Georgia, serif" fill="currentColor" letter-spacing="3" font-weight="600">CLICKHOME</text>
+  <text x="34" y="30" font-size="17" font-family="Georgia, serif" fill="currentColor" letter-spacing="3" font-weight="600">ClickHome</text>
 </svg>

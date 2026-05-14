@@ -4,8 +4,8 @@ import Image from 'next/image';
 
 const NAV_LINKS = [
   { href: '#services', label: 'Быстровозводимые здания' },
-  { href: '#spa', label: 'SPA и банные комплексы' },
-  { href: '#residential', label: 'Жилые комплексы' },
+  { href: '#services', label: 'SPA и банные комплексы' },
+  { href: '#services', label: 'Жилые комплексы' },
   { href: '#about', label: 'О компании' },
 ];
 
@@ -19,88 +19,133 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
+  const glassStyle = scrolled
+    ? {
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        background: 'rgba(255, 255, 255, 0.92)',
+        border: '0.5px solid rgba(0, 0, 0, 0.08)',
+        borderRadius: '14px',
+        margin: '12px 16px',
+      }
+    : {
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        background: 'rgba(255, 255, 255, 0.08)',
+        border: '0.5px solid rgba(255, 255, 255, 0.18)',
+        borderRadius: '14px',
+        margin: '12px 16px',
+      };
+
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'backdrop-blur-sm bg-white/90 shadow-sm' : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-content mx-auto px-6 md:px-12 lg:px-20 flex items-center justify-between h-16 md:h-20">
-        {/* Logo */}
-        <a href="#" className="flex-shrink-0">
-          <Image
-            src="/images/logo.svg"
-            alt="ClickHome"
-            width={160}
-            height={36}
-            className={`h-8 w-auto transition-all duration-300 ${scrolled ? 'brightness-0' : 'brightness-0 invert'}`}
-            priority
-          />
-        </a>
+    <nav className="fixed top-0 left-0 right-0 z-50">
+      <div className="transition-all duration-300" style={glassStyle}>
+        <div className="flex items-center justify-between h-14 px-4 md:px-6">
+          {/* Logo */}
+          <a href="#" className="flex-shrink-0">
+            <Image
+              src="/images/logo.svg"
+              alt="ClickHome"
+              width={140}
+              height={32}
+              className={`h-7 w-auto transition-all duration-300 ${
+                scrolled ? 'brightness-0' : 'brightness-0 invert'
+              }`}
+              priority
+            />
+          </a>
 
-        {/* Desktop nav */}
-        <ul className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                className={`font-sans text-sm tracking-wide transition-colors duration-200 ${
-                  scrolled
-                    ? 'text-[#1C1C1C] hover:text-[#2A5C1A]'
-                    : 'text-white/85 hover:text-white'
+          {/* Desktop nav */}
+          <ul className="hidden md:flex items-center gap-6">
+            {NAV_LINKS.map((link, i) => (
+              <li key={i}>
+                <a
+                  href={link.href}
+                  className={`font-sans text-[12px] tracking-wide transition-colors duration-200 ${
+                    scrolled
+                      ? 'text-[#1C1C1C] hover:text-[#2A5C1A]'
+                      : 'text-white/85 hover:text-white'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          {/* CTA + hamburger */}
+          <div className="flex items-center gap-3">
+            {/* CTA — desktop only */}
+            <a
+              href="#lead"
+              className={`hidden md:inline-flex items-center font-sans text-[11px] tracking-[0.1em] uppercase transition-all duration-300 rounded-[20px] px-[18px] py-[6px] ${
+                scrolled
+                  ? 'text-[#1C1C1C] border border-[#1C1C1C]/30 hover:border-[#1C1C1C]/60'
+                  : 'text-white border border-white/60 hover:border-white'
+              }`}
+            >
+              Связаться
+            </a>
+
+            {/* Hamburger — mobile only */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={`md:hidden flex flex-col gap-1.5 p-2 transition-colors duration-200 ${
+                scrolled ? 'text-[#1C1C1C]' : 'text-white'
+              }`}
+              aria-label="Меню"
+            >
+              <span
+                className={`block w-6 h-0.5 bg-current transition-transform duration-300 ${
+                  menuOpen ? 'translate-y-2 rotate-45' : ''
                 }`}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+              />
+              <span
+                className={`block w-6 h-0.5 bg-current transition-opacity duration-300 ${
+                  menuOpen ? 'opacity-0' : ''
+                }`}
+              />
+              <span
+                className={`block w-6 h-0.5 bg-current transition-transform duration-300 ${
+                  menuOpen ? '-translate-y-2 -rotate-45' : ''
+                }`}
+              />
+            </button>
+          </div>
+        </div>
 
-        {/* Hamburger */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className={`md:hidden flex flex-col gap-1.5 p-2 transition-colors duration-200 ${
-            scrolled ? 'text-[#1C1C1C]' : 'text-white'
+        {/* Mobile dropdown */}
+        <div
+          className={`md:hidden transition-all duration-300 overflow-hidden ${
+            menuOpen ? 'max-h-80' : 'max-h-0'
           }`}
-          aria-label="Меню"
+          style={{
+            borderTop: menuOpen ? '0.5px solid rgba(0,0,0,0.08)' : 'none',
+          }}
         >
-          <span
-            className={`block w-6 h-0.5 bg-current transition-transform duration-300 ${
-              menuOpen ? 'translate-y-2 rotate-45' : ''
-            }`}
-          />
-          <span
-            className={`block w-6 h-0.5 bg-current transition-opacity duration-300 ${
-              menuOpen ? 'opacity-0' : ''
-            }`}
-          />
-          <span
-            className={`block w-6 h-0.5 bg-current transition-transform duration-300 ${
-              menuOpen ? '-translate-y-2 -rotate-45' : ''
-            }`}
-          />
-        </button>
-      </div>
-
-      {/* Mobile overlay */}
-      <div
-        className={`md:hidden bg-white/95 backdrop-blur-sm transition-all duration-300 overflow-hidden ${
-          menuOpen ? 'max-h-80 border-t border-[#E0DFDA]' : 'max-h-0'
-        }`}
-      >
-        <ul className="flex flex-col px-6 py-4 gap-4">
-          {NAV_LINKS.map((link) => (
-            <li key={link.href}>
+          <ul className="flex flex-col px-4 py-4 gap-4 bg-white/95">
+            {NAV_LINKS.map((link, i) => (
+              <li key={i}>
+                <a
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="font-sans text-[#1C1C1C] text-base hover:text-[#2A5C1A] transition-colors duration-200 block py-1"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+            <li>
               <a
-                href={link.href}
+                href="#lead"
                 onClick={() => setMenuOpen(false)}
-                className="font-sans text-[#1C1C1C] text-base hover:text-[#2A5C1A] transition-colors duration-200 block py-1"
+                className="font-sans text-[#2A5C1A] text-base font-medium block py-1"
               >
-                {link.label}
+                Связаться →
               </a>
             </li>
-          ))}
-        </ul>
+          </ul>
+        </div>
       </div>
     </nav>
   );

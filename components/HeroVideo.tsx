@@ -1,6 +1,13 @@
 'use client';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
+const STATS = [
+  { value: '2017', label: 'Год основания' },
+  { value: '40+', label: 'Реализованных объектов' },
+  { value: '3', label: 'Направления строительства' },
+  { value: 'По всей России', label: 'География' },
+];
+
 export default function HeroVideo() {
   const { scrollY } = useScroll();
 
@@ -29,12 +36,12 @@ export default function HeroVideo() {
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/35" />
 
-      {/* Text block — bottom left */}
-      <div className="absolute bottom-16 left-6 md:left-20 text-white max-w-3xl z-10">
+      {/* Text block — shifted up to leave room for stats */}
+      <div className="absolute bottom-48 md:bottom-44 left-6 md:left-20 text-white max-w-3xl z-10">
         <p className="font-sans text-[11px] tracking-[0.25em] uppercase text-white/70 mb-5">
           Инженерия будущего
         </p>
-        <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-6">
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-6">
           Строим
           <br />
           спокойно.
@@ -59,8 +66,27 @@ export default function HeroVideo() {
         </a>
       </div>
 
-      {/* Scroll indicator — bottom right */}
-      <div className="absolute bottom-16 right-6 md:right-12 flex flex-col items-center gap-3 z-10">
+      {/* Stats — bottom of screen */}
+      <div className="absolute bottom-10 left-6 right-6 z-10 border-t border-white/10 pt-5">
+        <div className="grid grid-cols-2 md:flex md:flex-row gap-5 md:gap-0">
+          {STATS.map((stat, i) => (
+            <div
+              key={i}
+              className={`md:flex-1 ${
+                i < STATS.length - 1 ? 'md:border-r md:border-white/10' : ''
+              } md:pr-8`}
+            >
+              <p className="font-serif text-3xl text-white leading-none">{stat.value}</p>
+              <p className="font-sans text-[9px] uppercase tracking-[0.1em] text-white/40 mt-1">
+                {stat.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Scroll indicator — desktop only */}
+      <div className="absolute bottom-10 right-6 md:right-12 hidden md:flex flex-col items-center gap-3 z-10">
         <span
           className="font-sans text-white/50 text-[10px] tracking-[0.3em] uppercase"
           style={{ writingMode: 'vertical-rl' }}

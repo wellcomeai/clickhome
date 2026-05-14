@@ -1,6 +1,5 @@
 'use client';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 
 const PRINCIPLES = [
   'Инженерная точность',
@@ -20,7 +19,7 @@ export default function PhilosophySection() {
           Философия
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           {/* Left — tagline */}
           <motion.div
             className="text-white"
@@ -51,30 +50,13 @@ export default function PhilosophySection() {
             </a>
           </motion.div>
 
-          {/* Center — large photo */}
-          <motion.div
-            className="relative h-80 md:h-[480px] rounded-2xl overflow-hidden"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
-          >
-            <Image
-              src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80"
-              alt="Архитектура ClickHome"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 33vw"
-            />
-          </motion.div>
-
-          {/* Right — principles */}
+          {/* Right — principles + stats */}
           <motion.div
             className="text-white"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.15 }}
           >
             <p className="font-sans text-[11px] tracking-[0.2em] uppercase text-white/40 mb-6">
               Наши принципы
@@ -88,7 +70,7 @@ export default function PhilosophySection() {
               ))}
             </ul>
 
-            {/* Company stats snippet */}
+            {/* Company stats */}
             <div className="mt-12 pt-8 border-t border-white/10">
               <div className="flex gap-8">
                 <div>

@@ -1,11 +1,8 @@
 import Navbar from '@/components/Navbar';
 import HeroVideo from '@/components/HeroVideo';
-import ServicesSection from '@/components/ServicesSection';
-import StatsBar from '@/components/StatsBar';
-import MopsSection from '@/components/MopsSection';
-import SpaSection from '@/components/SpaSection';
-import ResidentialSection from '@/components/ResidentialSection';
+import DirectionsSection from '@/components/DirectionsSection';
 import PhilosophySection from '@/components/PhilosophySection';
+import LeadForm from '@/components/LeadForm';
 import Footer from '@/components/Footer';
 
 export default function Home() {
@@ -13,12 +10,9 @@ export default function Home() {
     <main>
       <Navbar />
       <HeroVideo />
-      <ServicesSection />
-      <StatsBar />
-      <MopsSection />
-      <SpaSection />
-      <ResidentialSection />
+      <DirectionsSection />
       <PhilosophySection />
+      <LeadForm />
       <Footer />
     </main>
   );
