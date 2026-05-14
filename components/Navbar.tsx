@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 
 const NAV_LINKS = [
@@ -12,15 +13,22 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [pillStyle, setPillStyle] = useState({ left: 0, width: 0 });
   const navRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const ulRef = useRef<HTMLUListElement | null>(null);
+  const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 80);
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
+    };
   }, []);
 
   const glassStyle = scrolled
@@ -41,7 +49,11 @@ export default function Navbar() {
         margin: '12px 16px',
       };
 
-  const handleNavClick = (i: number) => {
+  const handleEnter = (i: number) => {
+    if (leaveTimerRef.current) {
+      clearTimeout(leaveTimerRef.current);
+      leaveTimerRef.current = null;
+    }
     const el = navRefs.current[i];
     const parent = ulRef.current;
     if (el && parent) {
@@ -52,7 +64,14 @@ export default function Navbar() {
         width: elRect.width + 16,
       });
     }
-    setActiveIndex(i);
+    setHoveredIndex(i);
+  };
+
+  const handleListLeave = () => {
+    if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
+    leaveTimerRef.current = setTimeout(() => {
+      setHoveredIndex(null);
+    }, 150);
   };
 
   return (
@@ -79,34 +98,39 @@ export default function Navbar() {
           </a>
 
           {/* Desktop nav */}
-          <ul ref={ulRef} className="hidden md:flex items-center gap-6 relative">
-            {/* Animated pill */}
-            {activeIndex !== null && (
-              <div
-                className="absolute pointer-events-none rounded-[20px]"
-                style={{
-                  left: pillStyle.left,
-                  width: pillStyle.width,
-                  height: '28px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: scrolled ? 'rgba(42,92,26,0.08)' : 'rgba(255,255,255,0.15)',
-                  border: scrolled
-                    ? '0.5px solid rgba(42,92,26,0.2)'
-                    : '0.5px solid rgba(255,255,255,0.25)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                  transition: 'all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-                }}
-              />
-            )}
+          <ul
+            ref={ulRef}
+            className="hidden md:flex items-center gap-6 relative"
+            onMouseLeave={handleListLeave}
+          >
+            <motion.div
+              className="absolute pointer-events-none rounded-[20px]"
+              style={{
+                height: '28px',
+                top: '50%',
+                y: '-50%',
+                background: scrolled
+                  ? 'rgba(42,92,26,0.10)'
+                  : 'rgba(255,255,255,0.18)',
+                border: scrolled
+                  ? '0.5px solid rgba(42,92,26,0.25)'
+                  : '0.5px solid rgba(255,255,255,0.30)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
+              animate={{
+                left: pillStyle.left,
+                width: pillStyle.width,
+                opacity: hoveredIndex !== null ? 1 : 0,
+              }}
+              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+            />
 
             {NAV_LINKS.map((link, i) => (
-              <li key={i}>
+              <li key={i} onMouseEnter={() => handleEnter(i)}>
                 <a
                   ref={el => { navRefs.current[i] = el; }}
                   href={link.href}
-                  onClick={() => handleNavClick(i)}
                   className={`font-sans text-[12px] tracking-wide transition-colors duration-200 relative z-10 ${
                     scrolled
                       ? 'text-[#1C1C1C] hover:text-[#2A5C1A]'
