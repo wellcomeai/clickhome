@@ -1,5 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
+import RevealText from './RevealText';
 
 const PRINCIPLES = [
   'Инженерная точность',
@@ -28,15 +29,12 @@ export default function PhilosophySection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
-            <h2 className="font-serif text-4xl md:text-5xl leading-tight mb-8">
-              Технологичность.
-              <br />
-              Системность.
-              <br />
-              Архитектурная
-              <br />
-              эстетика.
-            </h2>
+            <RevealText
+              as="h2"
+              className="font-serif text-4xl md:text-5xl leading-tight mb-8 text-white"
+            >
+              Технологичность. Системность. Архитектурная эстетика.
+            </RevealText>
             <p className="font-sans text-white/50 text-sm leading-relaxed mb-8">
               С 2017 года мы строим объекты, которым доверяют. Каждый проект —
               это инженерное решение высшего класса с вниманием к деталям.
