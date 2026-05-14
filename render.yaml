@@ -3,7 +3,7 @@ services:
     name: clickhome-site
     env: node
     buildCommand: npm install && npm run build
-    startCommand: npm start -- -p $PORT
+    startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: 20
