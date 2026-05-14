@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Playfair_Display, Golos_Text } from 'next/font/google';
 import './globals.css';
+import CursorEffect from '@/components/CursorEffect';
 
 const playfair = Playfair_Display({
   subsets: ['latin', 'cyrillic'],
@@ -35,7 +36,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru" className={`${playfair.variable} ${golos.variable}`}>
-      <body>{children}</body>
+      <body>
+        <CursorEffect />
+        {children}
+      </body>
     </html>
   );
 }

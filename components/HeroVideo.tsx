@@ -25,6 +25,7 @@ export default function HeroVideo() {
     >
       {/* Video */}
       <video
+        data-cursor="video"
         autoPlay
         muted
         loop
