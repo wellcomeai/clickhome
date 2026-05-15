@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { FloatingInput } from './FloatingInput';
 
 interface FormData {
   name: string;
@@ -19,10 +20,6 @@ export default function LeadForm() {
     console.log(formData);
     alert('Заявка отправлена!');
   };
-
-  const inputClass =
-    'w-full font-sans text-[13px] text-[#1C1C1C] bg-[#F9F8F5] rounded-[10px] px-[14px] py-[12px] outline-none transition-colors duration-200 focus:border-[#2A5C1A] placeholder:text-[#6B6B6B]/60';
-  const inputStyle = { border: '0.5px solid #D0CFCA' };
 
   return (
     <section
@@ -44,33 +41,32 @@ export default function LeadForm() {
 
           {/* Right — form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-[10px]">
-            <input
+            <FloatingInput
+              label="Ваше имя"
+              name="name"
               type="text"
-              placeholder="Ваше имя"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={inputClass}
-              style={inputStyle}
+              onChange={(v) => setFormData({ ...formData, name: v })}
             />
-            <input
+            <FloatingInput
+              label="Телефон"
+              name="phone"
               type="tel"
-              placeholder="Телефон"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className={inputClass}
-              style={inputStyle}
+              onChange={(v) => setFormData({ ...formData, phone: v })}
             />
-            <select
+            <FloatingInput
+              as="select"
+              label="Направление"
+              name="direction"
               value={formData.direction}
-              onChange={(e) => setFormData({ ...formData, direction: e.target.value })}
-              className={inputClass}
-              style={{ ...inputStyle, appearance: 'none', WebkitAppearance: 'none' }}
-            >
-              <option value="">Выбрать направление</option>
-              <option value="mops">МОПс / Быстровозводимые здания</option>
-              <option value="spa">SPA и банные комплексы</option>
-              <option value="residential">Жилые комплексы</option>
-            </select>
+              onChange={(v) => setFormData({ ...formData, direction: v })}
+              options={[
+                { value: 'mops', label: 'МОПс / Быстровозводимые здания' },
+                { value: 'spa', label: 'SPA и банные комплексы' },
+                { value: 'residential', label: 'Жилые комплексы' },
+              ]}
+            />
             <button
               type="submit"
               className="w-full font-sans text-[11px] tracking-[0.15em] uppercase text-white bg-[#1C1C1C] rounded-[10px] py-[13px] px-5 cursor-pointer transition-opacity duration-200 hover:opacity-85 mt-1"
