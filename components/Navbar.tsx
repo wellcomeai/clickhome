@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import MagneticButton from './MagneticButton';
 
 const NAV_LINKS = [
   { href: '#services', label: 'Быстровозводимые здания' },
@@ -146,16 +147,18 @@ export default function Navbar() {
           {/* CTA + hamburger */}
           <div className="flex items-center gap-3">
             {/* CTA — desktop only */}
-            <a
-              href="#lead"
-              className={`hidden md:inline-flex items-center font-sans text-[11px] tracking-[0.1em] uppercase transition-all duration-300 rounded-[20px] px-[18px] py-[6px] ${
-                scrolled
-                  ? 'text-[#1C1C1C] border border-[#1C1C1C]/30 hover:border-[#1C1C1C]/60'
-                  : 'text-white border border-white/60 hover:border-white'
-              }`}
-            >
-              Связаться
-            </a>
+            <MagneticButton className="hidden md:inline-block">
+              <a
+                href="#lead"
+                className={`inline-flex items-center font-sans text-[11px] tracking-[0.1em] uppercase transition-colors duration-300 rounded-[20px] px-[18px] py-[6px] ${
+                  scrolled
+                    ? 'text-[#1C1C1C] border border-[#1C1C1C]/30 hover:border-[#1C1C1C]/60'
+                    : 'text-white border border-white/60 hover:border-white'
+                }`}
+              >
+                Связаться
+              </a>
+            </MagneticButton>
 
             {/* Hamburger — mobile only */}
             <button

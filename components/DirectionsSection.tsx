@@ -11,6 +11,7 @@ import {
   useTransform,
   Variants,
 } from 'framer-motion';
+import MagneticButton from './MagneticButton';
 
 type ModalKey = 'mops' | 'spa' | 'residential';
 
@@ -468,13 +469,15 @@ function DirectionModal({
             </div>
           )}
 
-          <a
-            href="#lead"
-            onClick={onClose}
-            className="inline-flex items-center gap-2 bg-[#1C1C1C] text-white font-sans text-[11px] tracking-[0.12em] uppercase rounded-[12px] px-6 py-3.5 hover:opacity-85 transition-opacity"
-          >
-            {data.cta}
-          </a>
+          <MagneticButton>
+            <a
+              href="#lead"
+              onClick={onClose}
+              className="inline-flex items-center gap-2 bg-[#1C1C1C] text-white font-sans text-[11px] tracking-[0.12em] uppercase rounded-[12px] px-6 py-3.5 hover:opacity-85 transition-opacity"
+            >
+              {data.cta}
+            </a>
+          </MagneticButton>
         </div>
       </div>
     </motion.div>

@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { FloatingInput } from './FloatingInput';
+import MagneticButton from './MagneticButton';
 
 interface FormData {
   name: string;
@@ -67,12 +68,14 @@ export default function LeadForm() {
                 { value: 'residential', label: 'Жилые комплексы' },
               ]}
             />
-            <button
-              type="submit"
-              className="w-full font-sans text-[11px] tracking-[0.15em] uppercase text-white bg-[#1C1C1C] rounded-[10px] py-[13px] px-5 cursor-pointer transition-opacity duration-200 hover:opacity-85 mt-1"
-            >
-              Отправить заявку →
-            </button>
+            <MagneticButton className="block w-full mt-1">
+              <button
+                type="submit"
+                className="w-full font-sans text-[11px] tracking-[0.15em] uppercase text-white bg-[#1C1C1C] rounded-[10px] py-[13px] px-5 transition-opacity duration-200 hover:opacity-85"
+              >
+                Отправить заявку →
+              </button>
+            </MagneticButton>
           </form>
         </div>
       </div>
