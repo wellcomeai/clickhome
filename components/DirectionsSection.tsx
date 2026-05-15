@@ -9,7 +9,6 @@ const VIEWPORT = { once: true, margin: '-80px' } as const;
 const R2 = 'https://pub-b1e3de631e544c69b0ad6587f740e140.r2.dev';
 
 const BG = '#F4F3EF';
-const STACK_SHADOW = '0 -8px 40px rgba(0,0,0,0.08)';
 const TOP_HAIRLINE = '0.5px solid #E0DFDA';
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -165,7 +164,7 @@ function CaseHeading({ children }: { children: React.ReactNode }) {
 function Block01() {
   return (
     <div
-      className="sticky top-0 z-10 min-h-screen w-full py-24 md:py-32 px-6 md:px-12 lg:px-20"
+      className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-20"
       style={{ background: BG }}
     >
       <div className="max-w-content mx-auto w-full">
@@ -257,11 +256,10 @@ const SPA_GALLERY = [
 function Block02() {
   return (
     <div
-      className="sticky top-0 z-20 min-h-screen w-full py-24 md:py-32 px-6 md:px-12 lg:px-20"
+      className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-20"
       style={{
         background: BG,
         borderTop: TOP_HAIRLINE,
-        boxShadow: STACK_SHADOW,
       }}
     >
       <div className="max-w-content mx-auto w-full">
@@ -334,11 +332,10 @@ const TECHS: { icon: string; label: string }[] = [
 function Block03() {
   return (
     <div
-      className="sticky top-0 z-30 min-h-screen w-full py-24 md:py-32 px-6 md:px-12 lg:px-20"
+      className="relative w-full py-24 md:py-32 px-6 md:px-12 lg:px-20"
       style={{
         background: BG,
         borderTop: TOP_HAIRLINE,
-        boxShadow: STACK_SHADOW,
       }}
     >
       <div className="max-w-content mx-auto w-full">
