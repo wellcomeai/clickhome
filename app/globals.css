@@ -36,16 +36,3 @@ body {
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 16px);
 }
-
-@media (pointer: fine) {
-  body,
-  a,
-  button,
-  [role='button'],
-  input,
-  textarea,
-  select,
-  label {
-    cursor: none !important;
-  }
-}

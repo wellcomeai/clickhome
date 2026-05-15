@@ -1,70 +1,16 @@
 'use client';
-import { useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useCountUp } from '@/hooks/useCountUp';
-import { scrambleText } from '@/lib/textScramble';
 import MagneticButton from './MagneticButton';
 
-const HEADING_LINES = ['Строим', 'спокойно.', 'Потому что', 'умеем.'];
-
-type Stat =
-  | { kind: 'number'; from: number; to: number; suffix?: string; label: string }
-  | { kind: 'text'; text: string; label: string };
-
-const STATS: Stat[] = [
-  { kind: 'number', from: 2010, to: 2017, label: 'Год основания' },
-  { kind: 'number', from: 0, to: 40, suffix: '+', label: 'Реализованных объектов' },
-  { kind: 'number', from: 0, to: 3, label: 'Направления строительства' },
-  { kind: 'text', text: 'По всей России', label: 'География' },
+const STATS = [
+  { value: '2017', label: 'Год основания' },
+  { value: '40+', label: 'Реализованных объектов' },
+  { value: '3', label: 'Направления строительства' },
+  { value: 'По всей России', label: 'География' },
 ];
-
-function AnimatedNumber({
-  from,
-  to,
-  suffix,
-}: {
-  from: number;
-  to: number;
-  suffix?: string;
-}) {
-  const [value, ref] = useCountUp(from, to, 1800);
-  return (
-    <span ref={ref}>
-      {Math.round(value)}
-      {suffix ?? ''}
-    </span>
-  );
-}
 
 export default function HeroVideo() {
   const { scrollY } = useScroll();
-  const [displayedLines, setDisplayedLines] = useState<string[]>(
-    HEADING_LINES.map(() => '')
-  );
-
-  useEffect(() => {
-    const cancels: Array<() => void> = [];
-    const timeouts: Array<ReturnType<typeof setTimeout>> = [];
-
-    HEADING_LINES.forEach((line, i) => {
-      const t = setTimeout(() => {
-        const cancel = scrambleText(line, (out) => {
-          setDisplayedLines((prev) => {
-            const next = [...prev];
-            next[i] = out;
-            return next;
-          });
-        }, 1200);
-        cancels.push(cancel);
-      }, 600 + i * 200);
-      timeouts.push(t);
-    });
-
-    return () => {
-      timeouts.forEach(clearTimeout);
-      cancels.forEach((c) => c());
-    };
-  }, []);
 
   const clipPath = useTransform(
     scrollY,
@@ -80,7 +26,6 @@ export default function HeroVideo() {
     >
       {/* Video */}
       <video
-        data-cursor="video"
         autoPlay
         muted
         loop
@@ -98,11 +43,13 @@ export default function HeroVideo() {
           Инженерия будущего
         </p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-6">
-          {HEADING_LINES.map((_, i) => (
-            <span key={i} className="block min-h-[1.05em]">
-              {displayedLines[i] || ' '}
-            </span>
-          ))}
+          Строим
+          <br />
+          спокойно.
+          <br />
+          Потому что
+          <br />
+          умеем.
         </h1>
         <p className="font-sans text-base md:text-lg text-white/75 mb-8 max-w-md">
           Архитектурные и модульные решения
@@ -132,25 +79,7 @@ export default function HeroVideo() {
                 i < STATS.length - 1 ? 'md:border-r md:border-white/10' : ''
               } md:pr-8`}
             >
-              {stat.kind === 'number' ? (
-                <p className="font-serif text-3xl text-white leading-none">
-                  <AnimatedNumber
-                    from={stat.from}
-                    to={stat.to}
-                    suffix={stat.suffix}
-                  />
-                </p>
-              ) : (
-                <motion.p
-                  className="font-serif text-3xl text-white leading-none"
-                  initial={{ opacity: 0, y: 8 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-10% 0px' }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                >
-                  {stat.text}
-                </motion.p>
-              )}
+              <p className="font-serif text-3xl text-white leading-none">{stat.value}</p>
               <p className="font-sans text-[9px] uppercase tracking-[0.1em] text-white/40 mt-1">
                 {stat.label}
               </p>

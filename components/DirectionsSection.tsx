@@ -238,7 +238,6 @@ function DirectionCard({
 
   return (
     <motion.div
-      data-cursor="card"
       variants={cardVariants[card.key]}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
@@ -350,39 +349,28 @@ function DirectionModal({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96, y: 20 }}
       transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-      drag="y"
-      dragConstraints={{ top: 0, bottom: 0 }}
-      dragElastic={0.15}
-      dragSnapToOrigin
-      onDragEnd={(_, info) => {
-        if (info.offset.y > 80) {
-          onClose();
-        }
-      }}
     >
-      <div
-        className="sticky top-0 z-20 flex items-center justify-between px-6 md:px-10 py-4 bg-white"
-        style={{ borderBottom: '0.5px solid #E0DFDA' }}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Закрыть"
+        className="fixed top-4 right-4 md:top-6 md:right-6 z-[70] w-11 h-11 flex items-center justify-center rounded-full bg-white text-[#1C1C1C] shadow-lg hover:bg-[#F4F3EF] active:scale-95 transition-all"
+        style={{ border: '0.5px solid rgba(0,0,0,0.12)' }}
       >
-        <h2 className="font-serif text-[20px] md:text-[22px] text-[#1C1C1C]">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path
+            d="M1 1L13 13M13 1L1 13"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
+
+      <div className="sticky top-0 z-20 flex items-center px-6 md:px-10 py-4 bg-white" style={{ borderBottom: '0.5px solid #E0DFDA' }}>
+        <h2 className="font-serif text-[20px] md:text-[22px] text-[#1C1C1C] pr-14">
           {data.title}
         </h2>
-
-        <button
-          onClick={onClose}
-          className="w-10 h-10 flex items-center justify-center rounded-full text-[#1C1C1C] hover:bg-[#F4F3EF] transition-colors flex-shrink-0"
-          style={{ border: '0.5px solid #E0DFDA' }}
-          aria-label="Закрыть"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path
-              d="M1 1L13 13M13 1L1 13"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto">
