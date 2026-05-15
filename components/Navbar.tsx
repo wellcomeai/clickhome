@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import MagneticButton from './MagneticButton';
+import { useActiveSection } from '@/hooks/useActiveSection';
+
+const SECTION_IDS = ['services', 'about', 'lead'];
 
 const NAV_LINKS = [
   { href: '#services', label: 'Быстровозводимые здания' },
@@ -15,6 +18,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const activeSection = useActiveSection(SECTION_IDS);
   const [pillStyle, setPillStyle] = useState({ left: 0, width: 0 });
   const navRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const ulRef = useRef<HTMLUListElement | null>(null);
@@ -127,21 +131,32 @@ export default function Navbar() {
               transition={{ type: 'spring', stiffness: 350, damping: 30 }}
             />
 
-            {NAV_LINKS.map((link, i) => (
-              <li key={i} onMouseEnter={() => handleEnter(i)}>
-                <a
-                  ref={el => { navRefs.current[i] = el; }}
-                  href={link.href}
-                  className={`font-sans text-[12px] tracking-wide transition-colors duration-200 relative z-10 ${
-                    scrolled
-                      ? 'text-[#1C1C1C] hover:text-[#2A5C1A]'
-                      : 'text-white/85 hover:text-white'
-                  }`}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
+            {NAV_LINKS.map((link, i) => {
+              const isActive =
+                hoveredIndex === null &&
+                activeSection !== null &&
+                link.href === `#${activeSection}`;
+              const baseColor = scrolled
+                ? isActive
+                  ? 'text-[#2A5C1A]'
+                  : 'text-[#1C1C1C] hover:text-[#2A5C1A]'
+                : isActive
+                ? 'text-white'
+                : 'text-white/85 hover:text-white';
+              return (
+                <li key={i} onMouseEnter={() => handleEnter(i)}>
+                  <a
+                    ref={(el) => {
+                      navRefs.current[i] = el;
+                    }}
+                    href={link.href}
+                    className={`font-sans text-[12px] tracking-wide transition-colors duration-200 relative z-10 ${baseColor}`}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
 
           {/* CTA + hamburger */}
