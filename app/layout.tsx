@@ -1,19 +1,6 @@
 import type { Metadata } from 'next';
-import { Playfair_Display, Golos_Text } from 'next/font/google';
 import './globals.css';
 import ScrollProgress from '@/components/ScrollProgress';
-
-const playfair = Playfair_Display({
-  subsets: ['latin', 'cyrillic'],
-  variable: '--font-playfair',
-  display: 'swap',
-});
-
-const golos = Golos_Text({
-  subsets: ['latin', 'cyrillic'],
-  variable: '--font-golos',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'ClickHome — Строим объекты, которым доверяют',
@@ -35,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" className={`${playfair.variable} ${golos.variable}`}>
+    <html lang="ru">
       <body>
         <ScrollProgress />
         {children}
