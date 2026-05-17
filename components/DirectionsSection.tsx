@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import Carousel from './Carousel';
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 const VIEWPORT = { once: true, margin: '-80px' } as const;
@@ -176,48 +177,21 @@ function Block01() {
         </Description>
         <Tags items={['Собственное производство', 'Любой проект под запрос', 'Полный цикл']} />
 
-        <MediaWrap>
-          <div className="mt-12 relative w-full aspect-video rounded-2xl overflow-hidden bg-black">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover"
-              src={`${R2}/0306fa953bedf01ee001d98ae09729f6_1_1778753479_1109.mp4`}
-            />
-          </div>
-        </MediaWrap>
-
         <MediaWrap delay={0.2}>
-          <div className="mt-3 flex md:grid md:grid-cols-3 gap-3 overflow-x-auto md:overflow-visible no-scrollbar snap-x">
-            <div className="relative shrink-0 snap-start w-[78%] md:w-auto aspect-[4/3] rounded-2xl overflow-hidden">
-              <Image
-                src={`${R2}/%D0%9C%D0%9E%D0%9F%D0%A1.jpg`}
-                alt="МОПс"
-                fill
-                sizes="(min-width: 768px) 33vw, 78vw"
-                className="object-cover"
-              />
-            </div>
-            <div className="relative shrink-0 snap-start w-[78%] md:w-auto aspect-[4/3] rounded-2xl overflow-hidden">
-              <Image
-                src={`${R2}/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BE%D1%84%D0%B8%D1%81%D0%BD%D1%8B%D0%B9.jpg`}
-                alt="Модульный офисный"
-                fill
-                sizes="(min-width: 768px) 33vw, 78vw"
-                className="object-cover"
-              />
-            </div>
-            <div className="relative shrink-0 snap-start w-[78%] md:w-auto aspect-[4/3] rounded-2xl overflow-hidden">
-              <Image
-                src={`${R2}/%D0%BE%D1%84%D0%B8%D1%81%D0%BD%D1%8B%D0%B9%20%D0%BC%D0%BE%D0%B4%D1%83%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%202.jpg`}
-                alt="Офисный модульный 2"
-                fill
-                sizes="(min-width: 768px) 33vw, 78vw"
-                className="object-cover"
-              />
-            </div>
+          <div className="mt-12">
+            <Carousel
+              items={[
+                { src: `${R2}/%D0%9C%D0%9E%D0%9F%D0%A1.jpg`, alt: 'МОПс' },
+                {
+                  src: `${R2}/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BE%D1%84%D0%B8%D1%81%D0%BD%D1%8B%D0%B9.jpg`,
+                  alt: 'Модульный офисный',
+                },
+                {
+                  src: `${R2}/%D0%BE%D1%84%D0%B8%D1%81%D0%BD%D1%8B%D0%B9%20%D0%BC%D0%BE%D0%B4%D1%83%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%202.jpg`,
+                  alt: 'Офисный модульный 2',
+                },
+              ]}
+            />
           </div>
         </MediaWrap>
 
@@ -286,17 +260,13 @@ function Block02() {
         </MediaWrap>
 
         <MediaWrap delay={0.2}>
-          <div className="no-scrollbar mt-3 flex gap-3 overflow-x-auto snap-x">
-            {SPA_GALLERY.map((file, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={file}
-                src={`${R2}/${file}`}
-                alt={`SPA ${i + 1}`}
-                className="snap-start shrink-0 h-[420px] md:h-[520px] w-auto aspect-[3/4] rounded-[12px] object-cover bg-black/5"
-                loading={i < 2 ? 'eager' : 'lazy'}
-              />
-            ))}
+          <div className="mt-3">
+            <Carousel
+              items={SPA_GALLERY.map((file, i) => ({
+                src: `${R2}/${file}`,
+                alt: `SPA ${i + 1}`,
+              }))}
+            />
           </div>
         </MediaWrap>
 
