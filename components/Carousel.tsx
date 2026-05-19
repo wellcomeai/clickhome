@@ -119,7 +119,8 @@ export default function MediaCarousel({
       <motion.div
         onPanEnd={onPanEnd}
         className="relative mx-auto w-[82vw] md:w-[62vw] max-w-[640px]"
-        style={{ aspectRatio: activeRatio }}
+        animate={{ aspectRatio: activeRatio }}
+        transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
         {sorted.map((it, i) => {
           const off = i - active;
@@ -155,6 +156,15 @@ export default function MediaCarousel({
                   priority={i === 0}
                   draggable={false}
                 />
+              ) : off !== 0 && it.poster ? (
+                <Image
+                  src={it.poster}
+                  alt="video preview"
+                  fill
+                  sizes="(min-width: 768px) 62vw, 82vw"
+                  className="object-cover pointer-events-none"
+                  draggable={false}
+                />
               ) : (
                 <video
                   ref={(el) => {
@@ -165,7 +175,7 @@ export default function MediaCarousel({
                   poster={it.poster}
                   controls={off === 0}
                   playsInline
-                  preload="metadata"
+                  preload="auto"
                   style={{ pointerEvents: off === 0 ? 'auto' : 'none' }}
                 />
               )}
