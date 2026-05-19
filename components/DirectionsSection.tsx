@@ -1,13 +1,7 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
-import {
-  AnimatePresence,
-  motion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Modal, { type DirectionKey } from './Modal';
 
@@ -345,215 +339,187 @@ function PhotoGallery({
   );
 }
 
-function RevealWord({
-  word,
-  progress,
-  index,
-  start,
-  step,
-  windowSize,
-}: {
-  word: string;
-  progress: MotionValue<number>;
-  index: number;
-  start: number;
-  step: number;
-  windowSize: number;
-}) {
-  const wordStart = start + index * step;
-  const wordEnd = wordStart + windowSize;
-  const opacity = useTransform(progress, [wordStart, wordEnd], [0, 1]);
-  const blurPx = useTransform(progress, [wordStart, wordEnd], [8, 0]);
-  const filter = useTransform(blurPx, (v) => `blur(${v}px)`);
-
-  return (
-    <motion.span
-      style={{ opacity, filter, display: 'inline-block', willChange: 'opacity, filter' }}
-    >
-      {word}
-      {' '}
-    </motion.span>
-  );
-}
+const REVEAL_VIEWPORT = { once: true, margin: '-15% 0px' } as const;
 
 function RevealText({
   text,
-  progress,
-  start = 0.05,
-  end = 0.25,
-  windowSize = 0.08,
+  delay = 0,
+  stagger = 0.05,
 }: {
   text: string;
-  progress: MotionValue<number>;
-  start?: number;
-  end?: number;
-  windowSize?: number;
+  delay?: number;
+  stagger?: number;
 }) {
   const words = text.split(' ');
-  const span = Math.max(end - start - windowSize, 0.0001);
-  const step = words.length > 1 ? span / (words.length - 1) : 0;
 
   return (
-    <>
+    <motion.span
+      style={{ display: 'inline-block' }}
+      initial="hidden"
+      whileInView="visible"
+      viewport={REVEAL_VIEWPORT}
+      variants={{
+        hidden: {},
+        visible: { transition: { staggerChildren: stagger, delayChildren: delay } },
+      }}
+    >
       {words.map((word, i) => (
-        <RevealWord
+        <motion.span
           key={`${i}-${word}`}
-          word={word}
-          progress={progress}
-          index={i}
-          start={start}
-          step={step}
-          windowSize={windowSize}
-        />
+          style={{ display: 'inline-block', willChange: 'opacity, filter, transform' }}
+          variants={{
+            hidden: { opacity: 0, y: 8, filter: 'blur(6px)' },
+            visible: {
+              opacity: 1,
+              y: 0,
+              filter: 'blur(0px)',
+              transition: { duration: 0.55, ease: EASE },
+            },
+          }}
+        >
+          {word}
+          {i < words.length - 1 ? ' ' : ''}
+        </motion.span>
       ))}
-    </>
+    </motion.span>
   );
 }
 
 function DirectionBlock({
   data,
   onOpenForm,
-  isLast,
 }: {
   data: DirectionData;
   onOpenForm: (key: DirectionKey) => void;
-  isLast: boolean;
 }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  });
-
-  const sectionOpacity = useTransform(scrollYProgress, [0, 0.15], [0.85, 1]);
-
-  const numberY = useTransform(scrollYProgress, [0, 0.15], [30, 0]);
-  const numberOpacity = useTransform(scrollYProgress, [0, 0.15], [0, 1]);
-
-  const heightClass = isLast ? 'h-auto' : 'h-[200vh]';
-
   return (
-    <div
-      ref={containerRef}
-      className={`relative ${heightClass}`}
-      style={{ zIndex: data.zIndex }}
-    >
-      <motion.div
-        style={{ opacity: sectionOpacity }}
-        className="sticky top-0 min-h-screen w-full overflow-hidden bg-[#F4F3EF] flex flex-col"
-      >
-        <div className="flex-1 max-w-content w-full mx-auto px-6 md:px-10 lg:px-16 pt-24 md:pt-20 pb-10 grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-8 lg:gap-12 items-start">
-          {/* Left column */}
-          <div className="flex flex-col">
-            <motion.p
-              style={{ y: numberY, opacity: numberOpacity }}
-              className="font-serif text-[88px] md:text-[120px] lg:text-[140px] leading-[0.85] text-[#2A5C1A]"
-            >
-              {data.number}
-            </motion.p>
+    <div className="relative w-full overflow-hidden bg-[#F4F3EF] flex flex-col">
+      <div className="flex-1 max-w-content w-full mx-auto px-6 md:px-10 lg:px-16 pt-24 md:pt-28 pb-10 grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-8 lg:gap-12 items-start">
+        {/* Left column */}
+        <div className="flex flex-col">
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={REVEAL_VIEWPORT}
+            transition={{ duration: 0.7, ease: EASE }}
+            className="font-serif text-[88px] md:text-[120px] lg:text-[140px] leading-[0.85] text-[#2A5C1A]"
+          >
+            {data.number}
+          </motion.p>
 
-            <div className="mt-8 md:mt-10">
-              <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#6B6B6B] flex items-center gap-3">
-                <span className="block w-5 h-px bg-[#E0DFDA]" aria-hidden />
-                Направление
-              </p>
-              <h2 className="font-serif text-[44px] md:text-[56px] text-[#1C1C1C] leading-[1.05] mt-3">
-                <RevealText
-                  text={data.title}
-                  progress={scrollYProgress}
-                  start={0.08}
-                  end={0.22}
-                />
-              </h2>
-              <p className="font-sans text-[14px] text-[#6B6B6B] leading-relaxed mt-4 max-w-[360px]">
-                <RevealText
-                  text={data.tagline}
-                  progress={scrollYProgress}
-                  start={0.12}
-                  end={0.3}
-                />
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => onOpenForm(data.key)}
-              className="group mt-7 inline-flex items-center gap-3 self-start bg-[#2A5C1A] text-white font-sans text-[12px] tracking-[0.08em] rounded-[10px] px-6 py-3.5 hover:bg-[#1f4513] transition-colors"
-            >
-              Получить КП
-              <span className="transition-transform duration-300 group-hover:translate-x-1">
-                <IconArrowRight />
-              </span>
-            </button>
-
-            <div className="mt-10 pt-7 border-t border-[#E0DFDA] grid grid-cols-3 gap-4 md:gap-6">
-              {data.advantages.map((a) => (
-                <div key={a.title} className="flex flex-col">
-                  <span className="mb-3">{a.icon}</span>
-                  <p className="font-sans text-[13px] font-medium text-[#1C1C1C]">
-                    {a.title}
-                  </p>
-                  <p className="font-sans text-[11px] text-[#6B6B6B] leading-snug mt-1.5">
-                    {a.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
+          <div className="mt-8 md:mt-10">
+            <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#6B6B6B] flex items-center gap-3">
+              <span className="block w-5 h-px bg-[#E0DFDA]" aria-hidden />
+              Направление
+            </p>
+            <h2 className="font-serif text-[44px] md:text-[56px] text-[#1C1C1C] leading-[1.05] mt-3">
+              <RevealText text={data.title} delay={0.15} stagger={0.06} />
+            </h2>
+            <p className="font-sans text-[14px] text-[#6B6B6B] leading-relaxed mt-4 max-w-[360px]">
+              <RevealText text={data.tagline} delay={0.35} stagger={0.03} />
+            </p>
           </div>
 
-          {/* Right column — gallery */}
-          <div className="lg:pt-4">
-            <PhotoGallery photos={data.photos} aspect={data.photoAspect} />
-          </div>
+          <motion.button
+            type="button"
+            onClick={() => onOpenForm(data.key)}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={REVEAL_VIEWPORT}
+            transition={{ duration: 0.55, ease: EASE, delay: 0.55 }}
+            className="group mt-7 inline-flex items-center gap-3 self-start bg-[#2A5C1A] text-white font-sans text-[12px] tracking-[0.08em] rounded-[10px] px-6 py-3.5 hover:bg-[#1f4513] transition-colors"
+          >
+            Получить КП
+            <span className="transition-transform duration-300 group-hover:translate-x-1">
+              <IconArrowRight />
+            </span>
+          </motion.button>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={REVEAL_VIEWPORT}
+            transition={{ duration: 0.6, ease: EASE, delay: 0.65 }}
+            className="mt-10 pt-7 border-t border-[#E0DFDA] grid grid-cols-3 gap-4 md:gap-6"
+          >
+            {data.advantages.map((a) => (
+              <div key={a.title} className="flex flex-col">
+                <span className="mb-3">{a.icon}</span>
+                <p className="font-sans text-[13px] font-medium text-[#1C1C1C]">
+                  {a.title}
+                </p>
+                <p className="font-sans text-[11px] text-[#6B6B6B] leading-snug mt-1.5">
+                  {a.desc}
+                </p>
+              </div>
+            ))}
+          </motion.div>
         </div>
 
-        {/* Bottom row */}
-        <div className="max-w-content w-full mx-auto px-6 md:px-10 lg:px-16 pb-10 md:pb-14 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 border-t border-[#E0DFDA] pt-8 md:pt-10">
-          <div>
-            <p className="font-sans text-[10px] tracking-[0.22em] uppercase text-[#6B6B6B] mb-3">
-              О направлении
-            </p>
-            <p className="font-sans text-[13px] text-[#1C1C1C] leading-relaxed max-w-[300px]">
-              {data.about}
-            </p>
-          </div>
+        {/* Right column — gallery */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={REVEAL_VIEWPORT}
+          transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
+          className="lg:pt-4"
+        >
+          <PhotoGallery photos={data.photos} aspect={data.photoAspect} />
+        </motion.div>
+      </div>
 
-          <div>
-            <h3 className="font-serif text-[28px] md:text-[32px] text-[#1C1C1C] leading-[1.15]">
-              {data.phrase.lines.map((line) => (
-                <span
-                  key={line}
-                  className="block"
-                  style={line === data.phrase.accent ? { color: '#2A5C1A' } : undefined}
-                >
-                  {line}
+      {/* Bottom row */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={REVEAL_VIEWPORT}
+        transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
+        className="max-w-content w-full mx-auto px-6 md:px-10 lg:px-16 pb-16 md:pb-20 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 border-t border-[#E0DFDA] pt-8 md:pt-10"
+      >
+        <div>
+          <p className="font-sans text-[10px] tracking-[0.22em] uppercase text-[#6B6B6B] mb-3">
+            О направлении
+          </p>
+          <p className="font-sans text-[13px] text-[#1C1C1C] leading-relaxed max-w-[300px]">
+            {data.about}
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-serif text-[28px] md:text-[32px] text-[#1C1C1C] leading-[1.15]">
+            {data.phrase.lines.map((line) => (
+              <span
+                key={line}
+                className="block"
+                style={line === data.phrase.accent ? { color: '#2A5C1A' } : undefined}
+              >
+                {line}
+              </span>
+            ))}
+          </h3>
+        </div>
+
+        <div>
+          <ul className="flex flex-col gap-2.5">
+            {data.types.map((t, i) => (
+              <li
+                key={t}
+                className="font-sans text-[13px] text-[#1C1C1C] flex items-baseline gap-3"
+              >
+                <span className="font-sans text-[11px] text-[#6B6B6B] tabular-nums">
+                  {String(i + 1).padStart(2, '0')}
                 </span>
-              ))}
-            </h3>
-          </div>
-
-          <div>
-            <ul className="flex flex-col gap-2.5">
-              {data.types.map((t, i) => (
-                <li
-                  key={t}
-                  className="font-sans text-[13px] text-[#1C1C1C] flex items-baseline gap-3"
-                >
-                  <span className="font-sans text-[11px] text-[#6B6B6B] tabular-nums">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  {t}
-                </li>
-              ))}
-            </ul>
-            <a
-              href="#"
-              className="mt-6 inline-flex items-center gap-2 font-sans text-[11px] tracking-[0.15em] uppercase text-[#1C1C1C] border-b border-[#1C1C1C]/30 hover:border-[#1C1C1C] pb-0.5 transition-colors"
-            >
-              Скачать презентацию направления
-              <IconDownload />
-            </a>
-          </div>
+                {t}
+              </li>
+            ))}
+          </ul>
+          <a
+            href="#"
+            className="mt-6 inline-flex items-center gap-2 font-sans text-[11px] tracking-[0.15em] uppercase text-[#1C1C1C] border-b border-[#1C1C1C]/30 hover:border-[#1C1C1C] pb-0.5 transition-colors"
+          >
+            Скачать презентацию направления
+            <IconDownload />
+          </a>
         </div>
       </motion.div>
     </div>
@@ -572,13 +538,8 @@ export default function DirectionsSection() {
   return (
     <>
       <section id="services" className="relative">
-        {DATA.map((d, i) => (
-          <DirectionBlock
-            key={d.key}
-            data={d}
-            onOpenForm={openForm}
-            isLast={i === DATA.length - 1}
-          />
+        {DATA.map((d) => (
+          <DirectionBlock key={d.key} data={d} onOpenForm={openForm} />
         ))}
       </section>
 
