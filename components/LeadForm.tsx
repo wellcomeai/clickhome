@@ -8,43 +8,71 @@ interface FormData {
   direction: string;
 }
 
+const PERKS = [
+  'Ответим в течение часа',
+  'Бесплатный расчёт',
+  'Выезд на объект',
+];
+
+function Check() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A5C1A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  );
+}
+
 export default function LeadForm() {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     phone: '',
     direction: '',
   });
+  const [sent, setSent] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData);
-    alert('Заявка отправлена!');
+    setSent(true);
   };
 
   return (
     <section
       id="lead"
-      className="relative z-20 bg-white py-20 px-6 md:px-12 lg:px-20"
+      className="relative z-30 bg-white py-20 md:py-28 px-6 md:px-12 lg:px-20"
       style={{ borderTop: '0.5px solid #E0DFDA', borderBottom: '0.5px solid #E0DFDA' }}
     >
-      <div className="max-w-content mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left — text */}
-          <div>
-            <h2 className="font-serif text-[32px] md:text-[40px] text-[#1C1C1C] leading-tight mb-4">
-              Обсудим ваш проект?
-            </h2>
-            <p className="font-sans text-sm text-[#6B6B6B] leading-relaxed max-w-xs">
-              Расскажите о задаче — предложим решение и сроки. Бесплатная консультация.
-            </p>
-          </div>
+      <div className="max-w-content mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
+        {/* Left */}
+        <div>
+          <h2 className="font-serif text-[36px] md:text-[48px] text-[#1C1C1C] leading-[1.05] mb-5">
+            Обсудим ваш проект?
+          </h2>
+          <p className="font-sans text-[14px] text-[#6B6B6B] leading-relaxed max-w-[400px] mb-10">
+            Расскажите о задаче — предложим решение. Бесплатная консультация.
+          </p>
 
-          {/* Right — form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-[10px]">
+          <ul className="flex flex-col gap-4">
+            {PERKS.map((p) => (
+              <li
+                key={p}
+                className="flex items-center gap-3 font-sans text-[14px] text-[#1C1C1C]"
+              >
+                <span className="w-7 h-7 rounded-full bg-[#2A5C1A]/10 flex items-center justify-center flex-shrink-0">
+                  <Check />
+                </span>
+                {p}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Right */}
+        {!sent ? (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-[10px] md:pt-2">
             <FloatingInput
-              label="Ваше имя"
+              label="Имя"
               name="name"
-              type="text"
               value={formData.name}
               onChange={(v) => setFormData({ ...formData, name: v })}
             />
@@ -62,19 +90,29 @@ export default function LeadForm() {
               value={formData.direction}
               onChange={(v) => setFormData({ ...formData, direction: v })}
               options={[
-                { value: 'mops', label: 'МОПс / Быстровозводимые здания' },
+                { value: 'bvk', label: 'БВК — Быстровозводимые здания' },
                 { value: 'spa', label: 'SPA и банные комплексы' },
-                { value: 'residential', label: 'Жилые комплексы' },
+                { value: 'house', label: 'Жильё' },
               ]}
             />
             <button
               type="submit"
-              className="w-full font-sans text-[11px] tracking-[0.15em] uppercase text-white bg-[#1C1C1C] rounded-[10px] py-[13px] px-5 cursor-pointer transition-opacity duration-200 hover:opacity-85 mt-1"
+              className="w-full font-sans text-[11px] tracking-[0.15em] uppercase text-white bg-[#1C1C1C] rounded-[10px] py-[14px] px-5 hover:opacity-85 transition-opacity mt-2"
             >
               Отправить заявку →
             </button>
           </form>
-        </div>
+        ) : (
+          <div className="md:pt-2 py-10 px-6 bg-[#F4F3EF] rounded-[12px] text-center">
+            <div className="w-12 h-12 rounded-full bg-[#2A5C1A]/10 flex items-center justify-center mx-auto mb-4">
+              <Check />
+            </div>
+            <h3 className="font-serif text-[22px] text-[#1C1C1C] mb-2">Спасибо!</h3>
+            <p className="font-sans text-[13px] text-[#6B6B6B]">
+              Мы свяжемся с вами в течение часа.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
