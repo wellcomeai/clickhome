@@ -30,7 +30,7 @@ export default function HeroVideo() {
         loop
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
-        src="https://pub-b1e3de631e544c69b0ad6587f740e140.r2.dev/%D0%94%D0%BE%D0%BC%20%D1%81%D0%B6%D0%B0%D1%82%D1%82%D1%82%D1%82%D1%8B%D0%B9.MP4"
+        src="https://storage.yandexcloud.net/clickhome/%D0%B4%D0%BE%D0%BE%D0%BE%D0%BE%D0%BC%20%D1%81%D0%B6%D0%B0%D1%82%D1%8B%D0%B9.mp4"
       />
 
       {/* Dark overlay */}
