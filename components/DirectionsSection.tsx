@@ -1,8 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { motion } from 'framer-motion';
-import Carousel from './Carousel';
+import MediaCarousel, { type MediaItem } from './Carousel';
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 const VIEWPORT = { once: true, margin: '-80px' } as const;
@@ -15,14 +14,16 @@ const TOP_HAIRLINE = '0.5px solid #E0DFDA';
 const enc = (s: string) => encodeURIComponent(s);
 
 const MOPS_FOLDER = `${YC}/${enc('быстровозводимые здания')}`;
-const MOPS_GALLERY = [
-  { src: `${MOPS_FOLDER}/${enc('МОПс.jpg')}`, alt: 'МОПс — объект для госзаказчиков' },
-  { src: `${MOPS_FOLDER}/${enc('Офисный модульный.jpg')}`, alt: 'Модульный офис' },
-  { src: `${MOPS_FOLDER}/${enc('офисный модульный 2.jpg')}`, alt: 'Модульный офис 2' },
-];
+const MOPS_POSTER = `${MOPS_FOLDER}/${enc('МОПс.jpg')}`;
 const MOPS_VIDEO = `${MOPS_FOLDER}/${enc('Установка офиса модульного.MP4')}`;
+const MOPS_MEDIA: MediaItem[] = [
+  { type: 'video', src: MOPS_VIDEO, poster: MOPS_POSTER },
+  { type: 'image', src: `${MOPS_FOLDER}/${enc('МОПс.jpg')}`, alt: 'МОПс — объект для госзаказчиков' },
+  { type: 'image', src: `${MOPS_FOLDER}/${enc('Офисный модульный.jpg')}`, alt: 'Модульный офис' },
+  { type: 'image', src: `${MOPS_FOLDER}/${enc('офисный модульный 2.jpg')}`, alt: 'Модульный офис 2' },
+];
 
-const SPA_GALLERY = [
+const SPA_IMAGES = [
   'СПА.jpg',
   'Спа 2.jpg',
   'Спа 3.jpg',
@@ -31,16 +32,22 @@ const SPA_GALLERY = [
   'спа 6.jpg',
   'СПА 7.jpg',
   'СПА 8.jpg',
-].map((f, i) => ({ src: `${YC}/SPA/${enc(f)}`, alt: `SPA ${i + 1}` }));
+];
 const SPA_VIDEO = `${YC}/SPA/${enc('Обзор SPA.MOV')}`;
-const SPA_POSTER = SPA_GALLERY[0].src;
+const SPA_POSTER = `${YC}/SPA/${enc(SPA_IMAGES[0])}`;
+const SPA_MEDIA: MediaItem[] = [
+  { type: 'video', src: SPA_VIDEO, poster: SPA_POSTER },
+  ...SPA_IMAGES.map(
+    (f, i): MediaItem => ({ type: 'image', src: `${YC}/SPA/${enc(f)}`, alt: `SPA ${i + 1}` }),
+  ),
+];
 
 const ZHK_FOLDER = `${YC}/${enc('Жилые комплексы')}`;
-const ZHK_IMAGES = {
-  tall: { src: `${ZHK_FOLDER}/${enc('Дом 111.jpg')}`, alt: 'Дом 1' },
-  topRight: { src: `${ZHK_FOLDER}/${enc('дом 222.jpg')}`, alt: 'Дом 2' },
-  botRight: { src: `${ZHK_FOLDER}/${enc('дом 333.jpg')}`, alt: 'Дом 3' },
-};
+const ZHK_MEDIA: MediaItem[] = [
+  { type: 'image', src: `${ZHK_FOLDER}/${enc('Дом 111.jpg')}`, alt: 'Дом 1' },
+  { type: 'image', src: `${ZHK_FOLDER}/${enc('дом 222.jpg')}`, alt: 'Дом 2' },
+  { type: 'image', src: `${ZHK_FOLDER}/${enc('дом 333.jpg')}`, alt: 'Дом 3' },
+];
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
@@ -218,29 +225,9 @@ function Block01() {
           </div>
         </div>
 
-        <div>
-          <MediaWrap delay={0.2}>
-            <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden">
-              <Carousel
-                items={MOPS_GALLERY}
-                className="relative w-full h-full"
-                aspectRatio={3 / 4}
-              />
-            </div>
-          </MediaWrap>
-          <MediaWrap delay={0.3}>
-            <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-black mt-3">
-              <video
-                controls
-                playsInline
-                preload="none"
-                poster={MOPS_GALLERY[0].src}
-                className="absolute inset-0 w-full h-full object-cover"
-                src={MOPS_VIDEO}
-              />
-            </div>
-          </MediaWrap>
-        </div>
+        <MediaWrap delay={0.2}>
+          <MediaCarousel items={MOPS_MEDIA} />
+        </MediaWrap>
       </div>
     </div>
   );
@@ -255,28 +242,7 @@ function Block02() {
       <div className="max-w-content mx-auto w-full grid grid-cols-1 md:grid-cols-[7fr_5fr] gap-10 items-start">
         <div className="order-2 md:order-1">
           <MediaWrap>
-            <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-black max-w-[480px]">
-              <video
-                controls
-                playsInline
-                preload="none"
-                poster={SPA_POSTER}
-                className="absolute inset-0 w-full h-full object-cover"
-                src={SPA_VIDEO}
-              />
-            </div>
-          </MediaWrap>
-          <MediaWrap delay={0.2}>
-            <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar pb-1">
-              {SPA_GALLERY.map((it) => (
-                <div
-                  key={it.src}
-                  className="relative shrink-0 w-[72px] aspect-[3/4] rounded-lg overflow-hidden"
-                >
-                  <Image src={it.src} alt={it.alt} fill sizes="72px" className="object-cover" />
-                </div>
-              ))}
-            </div>
+            <MediaCarousel items={SPA_MEDIA} />
           </MediaWrap>
         </div>
 
@@ -372,37 +338,7 @@ function Block03() {
         </div>
 
         <MediaWrap delay={0.2}>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden">
-              <Image
-                src={ZHK_IMAGES.tall.src}
-                alt={ZHK_IMAGES.tall.alt}
-                fill
-                sizes="(min-width: 768px) 30vw, 50vw"
-                className="object-cover"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden">
-                <Image
-                  src={ZHK_IMAGES.topRight.src}
-                  alt={ZHK_IMAGES.topRight.alt}
-                  fill
-                  sizes="(min-width: 768px) 30vw, 50vw"
-                  className="object-cover"
-                />
-              </div>
-              <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden">
-                <Image
-                  src={ZHK_IMAGES.botRight.src}
-                  alt={ZHK_IMAGES.botRight.alt}
-                  fill
-                  sizes="(min-width: 768px) 30vw, 50vw"
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          </div>
+          <MediaCarousel items={ZHK_MEDIA} />
         </MediaWrap>
       </div>
     </div>
