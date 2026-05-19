@@ -2,7 +2,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 const STATS = [
-  { value: '2017', label: 'Год основания' },
+  { value: '2022', label: 'На рынке с 2022' },
   { value: '40+', label: 'Реализованных объектов' },
   { value: '3', label: 'Направления строительства' },
   { value: 'По всей России', label: 'География' },
@@ -55,15 +55,28 @@ export default function HeroVideo() {
           <br />
           для современного девелопмента
         </p>
-        <a
-          href="#services"
-          className="inline-flex items-center gap-3 font-sans text-sm tracking-[0.15em] uppercase text-white border-b border-white/50 pb-0.5 hover:border-white transition-colors duration-300 group"
-        >
-          Смотреть проекты
-          <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">
-            →
-          </span>
-        </a>
+        <div className="flex items-end gap-8 flex-wrap">
+          <a
+            href="#services"
+            className="inline-flex items-center gap-3 font-sans text-sm tracking-[0.15em] uppercase text-white border-b border-white/50 pb-0.5 hover:border-white transition-colors duration-300 group"
+          >
+            Смотреть проекты
+            <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">
+              →
+            </span>
+          </a>
+          <a
+            href="https://t.me/PLACEHOLDER"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 font-sans text-sm tracking-[0.12em] uppercase text-white/70 border-b border-white/30 pb-0.5 hover:text-white hover:border-white transition-colors duration-300"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.48 14.42l-2.95-.924c-.642-.204-.654-.642.136-.953l11.527-4.445c.535-.194 1.003.131.37.15z" />
+            </svg>
+            Telegram
+          </a>
+        </div>
       </div>
 
       {/* Stats — bottom of screen */}

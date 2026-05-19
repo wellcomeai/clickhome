@@ -9,7 +9,7 @@ const PRINCIPLES = [
 ];
 
 const STATS = [
-  { value: '2017', label: 'год' },
+  { value: '2022', label: 'год основания' },
   { value: '40+', label: 'объектов' },
   { value: '3', label: 'направления' },
 ];
@@ -36,7 +36,7 @@ export default function PhilosophySection() {
           </p>
 
           <h2 className="font-serif text-white text-[40px] md:text-[52px] leading-[1.08]">
-            «С 2017 года мы строим
+            «С 2022 года мы строим
             <br />
             объекты, которым доверяют»
           </h2>

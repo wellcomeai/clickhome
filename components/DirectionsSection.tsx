@@ -1,7 +1,13 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from 'framer-motion';
 import Image from 'next/image';
 import Modal, { type DirectionKey } from './Modal';
 
@@ -245,8 +251,12 @@ function PhotoGallery({
   const [dir, setDir] = useState(0);
   const len = photos.length;
 
-  const aspectClass = aspect === 'landscape' ? 'aspect-[16/9]' : 'aspect-[3/4]';
-  const thumbAspectClass = aspect === 'landscape' ? 'aspect-[16/9]' : 'aspect-[3/4]';
+  const aspectClass =
+    aspect === 'landscape'
+      ? 'aspect-[16/9]'
+      : 'aspect-[3/4] lg:aspect-[4/3] lg:max-h-[68vh]';
+  const thumbAspectClass =
+    aspect === 'landscape' ? 'aspect-[16/9]' : 'aspect-[3/4] lg:aspect-[4/3]';
 
   const go = (next: number) => {
     const n = ((next % len) + len) % len;
@@ -335,6 +345,71 @@ function PhotoGallery({
   );
 }
 
+function RevealWord({
+  word,
+  progress,
+  index,
+  start,
+  step,
+  windowSize,
+}: {
+  word: string;
+  progress: MotionValue<number>;
+  index: number;
+  start: number;
+  step: number;
+  windowSize: number;
+}) {
+  const wordStart = start + index * step;
+  const wordEnd = wordStart + windowSize;
+  const opacity = useTransform(progress, [wordStart, wordEnd], [0, 1]);
+  const blurPx = useTransform(progress, [wordStart, wordEnd], [8, 0]);
+  const filter = useTransform(blurPx, (v) => `blur(${v}px)`);
+
+  return (
+    <motion.span
+      style={{ opacity, filter, display: 'inline-block', willChange: 'opacity, filter' }}
+    >
+      {word}
+      {' '}
+    </motion.span>
+  );
+}
+
+function RevealText({
+  text,
+  progress,
+  start = 0.05,
+  end = 0.25,
+  windowSize = 0.08,
+}: {
+  text: string;
+  progress: MotionValue<number>;
+  start?: number;
+  end?: number;
+  windowSize?: number;
+}) {
+  const words = text.split(' ');
+  const span = Math.max(end - start - windowSize, 0.0001);
+  const step = words.length > 1 ? span / (words.length - 1) : 0;
+
+  return (
+    <>
+      {words.map((word, i) => (
+        <RevealWord
+          key={`${i}-${word}`}
+          word={word}
+          progress={progress}
+          index={i}
+          start={start}
+          step={step}
+          windowSize={windowSize}
+        />
+      ))}
+    </>
+  );
+}
+
 function DirectionBlock({
   data,
   onOpenForm,
@@ -347,18 +422,15 @@ function DirectionBlock({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start start', 'end start'],
+    offset: ['start end', 'end start'],
   });
 
-  const clipPath = useTransform(
-    scrollYProgress,
-    [0.5, 1],
-    ['inset(0% 0% 0% 0%)', 'inset(0% 0% 100% 0%)'],
-  );
+  const sectionOpacity = useTransform(scrollYProgress, [0, 0.15], [0.85, 1]);
+
+  const numberY = useTransform(scrollYProgress, [0, 0.15], [30, 0]);
+  const numberOpacity = useTransform(scrollYProgress, [0, 0.15], [0, 1]);
 
   const heightClass = isLast ? 'h-auto' : 'h-[200vh]';
-
-  const stickyStyle = isLast ? {} : { clipPath };
 
   return (
     <div
@@ -367,15 +439,18 @@ function DirectionBlock({
       style={{ zIndex: data.zIndex }}
     >
       <motion.div
-        style={stickyStyle}
+        style={{ opacity: sectionOpacity }}
         className="sticky top-0 min-h-screen w-full overflow-hidden bg-[#F4F3EF] flex flex-col"
       >
         <div className="flex-1 max-w-content w-full mx-auto px-6 md:px-10 lg:px-16 pt-24 md:pt-20 pb-10 grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-8 lg:gap-12 items-start">
           {/* Left column */}
           <div className="flex flex-col">
-            <p className="font-serif text-[88px] md:text-[120px] lg:text-[140px] leading-[0.85] text-[#2A5C1A]">
+            <motion.p
+              style={{ y: numberY, opacity: numberOpacity }}
+              className="font-serif text-[88px] md:text-[120px] lg:text-[140px] leading-[0.85] text-[#2A5C1A]"
+            >
               {data.number}
-            </p>
+            </motion.p>
 
             <div className="mt-8 md:mt-10">
               <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#6B6B6B] flex items-center gap-3">
@@ -383,10 +458,20 @@ function DirectionBlock({
                 Направление
               </p>
               <h2 className="font-serif text-[44px] md:text-[56px] text-[#1C1C1C] leading-[1.05] mt-3">
-                {data.title}
+                <RevealText
+                  text={data.title}
+                  progress={scrollYProgress}
+                  start={0.08}
+                  end={0.22}
+                />
               </h2>
               <p className="font-sans text-[14px] text-[#6B6B6B] leading-relaxed mt-4 max-w-[360px]">
-                {data.tagline}
+                <RevealText
+                  text={data.tagline}
+                  progress={scrollYProgress}
+                  start={0.12}
+                  end={0.3}
+                />
               </p>
             </div>
 

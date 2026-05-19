@@ -27,7 +27,7 @@ export default function Footer() {
               которым доверяют.
             </p>
             <p className="font-sans text-xs text-white/30 mt-4 tracking-wide">
-              ClickHome • Est. 2017
+              ClickHome • Est. 2022
             </p>
           </div>
 
