@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Modal, { type DirectionKey } from './Modal';
 import Lightbox from './Lightbox';
-import MasonryGallery from './MasonryGallery';
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -251,11 +250,11 @@ function PhotoGallery({
   const isPortrait = aspect === 'portrait';
 
   const mainClass = isPortrait
-    ? 'aspect-[4/3] max-h-[70vh] w-full bg-[#1C1C1C]'
+    ? 'h-[420px] md:h-[520px] lg:h-[560px] bg-[#ECEAE4]'
     : 'aspect-[16/9] bg-black';
-  const thumbAspectClass = isPortrait
-    ? 'aspect-[3/4] bg-[#1C1C1C]'
-    : 'aspect-[16/9]';
+  const thumbClass = isPortrait
+    ? 'aspect-[3/4] w-[18%] md:w-[20%] min-w-[64px] max-h-[100px] bg-[#ECEAE4]'
+    : 'aspect-[16/9] w-[22%] md:w-[24%] min-w-[80px]';
   const fitClass = isPortrait ? 'object-contain' : 'object-cover';
 
   const go = (next: number) => {
@@ -275,20 +274,21 @@ function PhotoGallery({
             key={`m-${i}`}
             type="button"
             onClick={() => onPhotoClick(i)}
-            className={`snap-start flex-shrink-0 w-[80vw] ${
-              isPortrait ? 'aspect-[3/4]' : 'aspect-[4/3]'
-            } rounded-xl overflow-hidden ${isPortrait ? 'bg-[#1C1C1C]' : 'bg-black'}`}
+            className={`snap-start flex-shrink-0 ${
+              isPortrait ? 'w-[72vw] h-[340px] bg-[#ECEAE4]' : 'w-[80vw] aspect-[4/3] bg-black'
+            } rounded-xl overflow-hidden`}
             aria-label={`Открыть фото ${i + 1}`}
           >
-            <Image
-              src={p.src}
-              alt={p.alt}
-              width={800}
-              height={isPortrait ? 1067 : 600}
-              sizes="80vw"
-              className={`${fitClass} w-full h-full`}
-              draggable={false}
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={p.src}
+                alt={p.alt}
+                fill
+                sizes="80vw"
+                className={fitClass}
+                draggable={false}
+              />
+            </div>
           </button>
         ))}
       </div>
@@ -296,7 +296,7 @@ function PhotoGallery({
       {/* Desktop: slider with thumbs */}
       <div className="hidden md:block">
         <div
-          className={`relative w-full ${mainClass} rounded-xl overflow-hidden cursor-zoom-in`}
+          className={`relative w-full rounded-xl overflow-hidden cursor-zoom-in ${mainClass}`}
           onClick={() => onPhotoClick(active)}
         >
           <AnimatePresence initial={false} custom={dir} mode="popLayout">
@@ -360,7 +360,7 @@ function PhotoGallery({
                   setDir(i > active ? 1 : -1);
                   setActive(i);
                 }}
-                className={`relative flex-shrink-0 ${thumbAspectClass} w-[24%] min-w-[100px] rounded-md overflow-hidden transition-all ${
+                className={`relative flex-shrink-0 ${thumbClass} rounded-md overflow-hidden transition-all ${
                   isActive ? 'ring-2 ring-white shadow-lg' : 'opacity-80 hover:opacity-100'
                 }`}
                 aria-label={`Слайд ${i + 1}`}
@@ -369,7 +369,7 @@ function PhotoGallery({
                   src={p.src}
                   alt={p.alt}
                   fill
-                  sizes="120px"
+                  sizes="80px"
                   className={fitClass}
                   draggable={false}
                 />
@@ -438,10 +438,9 @@ function DirectionBlock({
   onOpenForm: (key: DirectionKey) => void;
   onOpenLightbox: (photos: Photo[], index: number) => void;
 }) {
-  const isPortrait = data.photoAspect === 'portrait';
   return (
     <div className="relative w-full overflow-hidden bg-[#F4F3EF] flex flex-col">
-      <div className="flex-1 max-w-content w-full mx-auto px-6 md:px-10 lg:px-16 pt-24 md:pt-28 pb-10 grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-8 lg:gap-12 items-start">
+      <div className="flex-1 max-w-content w-full mx-auto px-6 md:px-10 lg:px-16 pt-24 md:pt-28 pb-10 grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-8 lg:gap-12 items-start lg:items-stretch">
         {/* Left column */}
         <div className="flex flex-col">
           <motion.p
@@ -509,49 +508,13 @@ function DirectionBlock({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={REVEAL_VIEWPORT}
           transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-          className="lg:pt-4"
+          className="lg:pt-4 lg:flex lg:flex-col lg:justify-center"
         >
-          {isPortrait ? (
-            <>
-              {/* Mobile: horizontal scroll-snap */}
-              <div className="md:hidden">
-                <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6">
-                  {data.photos.map((p, i) => (
-                    <button
-                      key={`m-${i}`}
-                      type="button"
-                      onClick={() => onOpenLightbox(data.photos, i)}
-                      className="snap-start flex-shrink-0 w-[80vw] aspect-[3/4] rounded-xl overflow-hidden bg-[#1C1C1C]"
-                      aria-label={`Открыть фото ${i + 1}`}
-                    >
-                      <Image
-                        src={p.src}
-                        alt={p.alt}
-                        width={800}
-                        height={1067}
-                        sizes="80vw"
-                        className="object-cover w-full h-full"
-                        draggable={false}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {/* Desktop: masonry */}
-              <div className="hidden md:block">
-                <MasonryGallery
-                  photos={data.photos}
-                  onPhotoClick={(i) => onOpenLightbox(data.photos, i)}
-                />
-              </div>
-            </>
-          ) : (
-            <PhotoGallery
-              photos={data.photos}
-              aspect={data.photoAspect}
-              onPhotoClick={(i) => onOpenLightbox(data.photos, i)}
-            />
-          )}
+          <PhotoGallery
+            photos={data.photos}
+            aspect={data.photoAspect}
+            onPhotoClick={(i) => onOpenLightbox(data.photos, i)}
+          />
         </motion.div>
       </div>
 

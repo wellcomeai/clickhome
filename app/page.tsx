@@ -5,7 +5,6 @@ import PhilosophySection from '@/components/PhilosophySection';
 import LeadForm from '@/components/LeadForm';
 import Footer from '@/components/Footer';
 import StickyMobileCTA from '@/components/StickyMobileCTA';
-import TelegramButton from '@/components/TelegramButton';
 
 export default function Home() {
   return (
@@ -17,7 +16,6 @@ export default function Home() {
       <LeadForm />
       <Footer />
       <StickyMobileCTA />
-      <TelegramButton />
     </main>
   );
 }
