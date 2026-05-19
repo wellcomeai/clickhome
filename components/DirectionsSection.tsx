@@ -1,9 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Modal, { type DirectionKey } from './Modal';
+import Lightbox from './Lightbox';
+import MasonryGallery from './MasonryGallery';
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -237,20 +239,24 @@ const DATA: DirectionData[] = [
 function PhotoGallery({
   photos,
   aspect,
+  onPhotoClick,
 }: {
   photos: Photo[];
   aspect: 'landscape' | 'portrait';
+  onPhotoClick: (index: number) => void;
 }) {
   const [active, setActive] = useState(0);
   const [dir, setDir] = useState(0);
   const len = photos.length;
+  const isPortrait = aspect === 'portrait';
 
-  const aspectClass =
-    aspect === 'landscape'
-      ? 'aspect-[16/9]'
-      : 'aspect-[3/4] lg:aspect-[4/3] lg:max-h-[68vh]';
-  const thumbAspectClass =
-    aspect === 'landscape' ? 'aspect-[16/9]' : 'aspect-[3/4] lg:aspect-[4/3]';
+  const mainClass = isPortrait
+    ? 'aspect-[4/3] max-h-[70vh] w-full bg-[#1C1C1C]'
+    : 'aspect-[16/9] bg-black';
+  const thumbAspectClass = isPortrait
+    ? 'aspect-[3/4] bg-[#1C1C1C]'
+    : 'aspect-[16/9]';
+  const fitClass = isPortrait ? 'object-contain' : 'object-cover';
 
   const go = (next: number) => {
     const n = ((next % len) + len) % len;
@@ -262,78 +268,115 @@ function PhotoGallery({
 
   return (
     <div className="w-full">
-      <div className={`relative w-full ${aspectClass} rounded-xl overflow-hidden bg-black`}>
-        <AnimatePresence initial={false} custom={dir} mode="popLayout">
-          <motion.div
-            key={active}
-            custom={dir}
-            initial={{ x: dir > 0 ? '6%' : '-6%', opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: dir > 0 ? '-6%' : '6%', opacity: 0 }}
-            transition={{ duration: 0.55, ease: EASE }}
-            className="absolute inset-0"
+      {/* Mobile: horizontal scroll-snap */}
+      <div className="flex md:hidden gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6">
+        {photos.map((p, i) => (
+          <button
+            key={`m-${i}`}
+            type="button"
+            onClick={() => onPhotoClick(i)}
+            className={`snap-start flex-shrink-0 w-[80vw] ${
+              isPortrait ? 'aspect-[3/4]' : 'aspect-[4/3]'
+            } rounded-xl overflow-hidden ${isPortrait ? 'bg-[#1C1C1C]' : 'bg-black'}`}
+            aria-label={`Открыть фото ${i + 1}`}
           >
             <Image
-              src={photos[active].src}
-              alt={photos[active].alt}
-              fill
-              sizes="(min-width: 1024px) 55vw, 100vw"
-              className="object-cover"
-              priority={active === 0}
+              src={p.src}
+              alt={p.alt}
+              width={800}
+              height={isPortrait ? 1067 : 600}
+              sizes="80vw"
+              className={`${fitClass} w-full h-full`}
               draggable={false}
             />
-          </motion.div>
-        </AnimatePresence>
-
-        <div className="absolute top-4 right-4 md:top-5 md:right-5 font-sans text-[11px] tracking-[0.18em] text-white/85 bg-black/35 backdrop-blur-sm rounded-full px-3 py-1.5 z-10">
-          {String(active + 1).padStart(2, '0')} / {String(len).padStart(2, '0')}
-        </div>
-
-        <button
-          type="button"
-          aria-label="Предыдущее"
-          onClick={() => go(active - 1)}
-          className="absolute top-1/2 -translate-y-1/2 left-3 md:left-5 w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/95 shadow-lg flex items-center justify-center hover:scale-105 transition-transform z-10"
-        >
-          <IconChevronLeft />
-        </button>
-        <button
-          type="button"
-          aria-label="Следующее"
-          onClick={() => go(active + 1)}
-          className="absolute top-1/2 -translate-y-1/2 right-3 md:right-5 w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/95 shadow-lg flex items-center justify-center hover:scale-105 transition-transform z-10"
-        >
-          <IconChevronRight />
-        </button>
+          </button>
+        ))}
       </div>
 
-      <div className="mt-3 flex gap-2 md:gap-3 overflow-x-auto md:overflow-visible -mx-1 px-1 md:mx-0 md:px-0">
-        {thumbs.map((p, i) => {
-          const isActive = i === active;
-          return (
-            <button
-              key={i}
-              type="button"
-              onClick={() => {
-                setDir(i > active ? 1 : -1);
-                setActive(i);
-              }}
-              className={`relative flex-shrink-0 ${thumbAspectClass} w-[22%] md:w-[24%] min-w-[100px] rounded-md overflow-hidden transition-all ${
-                isActive ? 'ring-2 ring-white shadow-lg' : 'opacity-80 hover:opacity-100'
-              }`}
-              aria-label={`Слайд ${i + 1}`}
+      {/* Desktop: slider with thumbs */}
+      <div className="hidden md:block">
+        <div
+          className={`relative w-full ${mainClass} rounded-xl overflow-hidden cursor-zoom-in`}
+          onClick={() => onPhotoClick(active)}
+        >
+          <AnimatePresence initial={false} custom={dir} mode="popLayout">
+            <motion.div
+              key={active}
+              custom={dir}
+              initial={{ x: dir > 0 ? '6%' : '-6%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: dir > 0 ? '-6%' : '6%', opacity: 0 }}
+              transition={{ duration: 0.55, ease: EASE }}
+              className="absolute inset-0"
             >
               <Image
-                src={p.src}
-                alt={p.alt}
+                src={photos[active].src}
+                alt={photos[active].alt}
                 fill
-                sizes="120px"
-                className="object-cover"
+                sizes="(min-width: 1024px) 55vw, 100vw"
+                className={fitClass}
+                priority={active === 0}
                 draggable={false}
               />
-            </button>
-          );
-        })}
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="absolute top-4 right-4 md:top-5 md:right-5 font-sans text-[11px] tracking-[0.18em] text-white/85 bg-black/35 backdrop-blur-sm rounded-full px-3 py-1.5 z-10">
+            {String(active + 1).padStart(2, '0')} / {String(len).padStart(2, '0')}
+          </div>
+
+          <button
+            type="button"
+            aria-label="Предыдущее"
+            onClick={(e) => {
+              e.stopPropagation();
+              go(active - 1);
+            }}
+            className="absolute top-1/2 -translate-y-1/2 left-3 md:left-5 w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/95 shadow-lg flex items-center justify-center hover:scale-105 transition-transform z-10"
+          >
+            <IconChevronLeft />
+          </button>
+          <button
+            type="button"
+            aria-label="Следующее"
+            onClick={(e) => {
+              e.stopPropagation();
+              go(active + 1);
+            }}
+            className="absolute top-1/2 -translate-y-1/2 right-3 md:right-5 w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/95 shadow-lg flex items-center justify-center hover:scale-105 transition-transform z-10"
+          >
+            <IconChevronRight />
+          </button>
+        </div>
+
+        <div className="mt-3 flex gap-2 md:gap-3">
+          {thumbs.map((p, i) => {
+            const isActive = i === active;
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => {
+                  setDir(i > active ? 1 : -1);
+                  setActive(i);
+                }}
+                className={`relative flex-shrink-0 ${thumbAspectClass} w-[24%] min-w-[100px] rounded-md overflow-hidden transition-all ${
+                  isActive ? 'ring-2 ring-white shadow-lg' : 'opacity-80 hover:opacity-100'
+                }`}
+                aria-label={`Слайд ${i + 1}`}
+              >
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  sizes="120px"
+                  className={fitClass}
+                  draggable={false}
+                />
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -364,22 +407,23 @@ function RevealText({
       }}
     >
       {words.map((word, i) => (
-        <motion.span
-          key={`${i}-${word}`}
-          style={{ display: 'inline-block', willChange: 'opacity, filter, transform' }}
-          variants={{
-            hidden: { opacity: 0, y: 8, filter: 'blur(6px)' },
-            visible: {
-              opacity: 1,
-              y: 0,
-              filter: 'blur(0px)',
-              transition: { duration: 0.55, ease: EASE },
-            },
-          }}
-        >
-          {word}
+        <Fragment key={`${i}-${word}`}>
+          <motion.span
+            style={{ display: 'inline-block', willChange: 'opacity, filter, transform' }}
+            variants={{
+              hidden: { opacity: 0, y: 8, filter: 'blur(6px)' },
+              visible: {
+                opacity: 1,
+                y: 0,
+                filter: 'blur(0px)',
+                transition: { duration: 0.55, ease: EASE },
+              },
+            }}
+          >
+            {word}
+          </motion.span>
           {i < words.length - 1 ? ' ' : ''}
-        </motion.span>
+        </Fragment>
       ))}
     </motion.span>
   );
@@ -388,10 +432,13 @@ function RevealText({
 function DirectionBlock({
   data,
   onOpenForm,
+  onOpenLightbox,
 }: {
   data: DirectionData;
   onOpenForm: (key: DirectionKey) => void;
+  onOpenLightbox: (photos: Photo[], index: number) => void;
 }) {
+  const isPortrait = data.photoAspect === 'portrait';
   return (
     <div className="relative w-full overflow-hidden bg-[#F4F3EF] flex flex-col">
       <div className="flex-1 max-w-content w-full mx-auto px-6 md:px-10 lg:px-16 pt-24 md:pt-28 pb-10 grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-8 lg:gap-12 items-start">
@@ -464,7 +511,47 @@ function DirectionBlock({
           transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
           className="lg:pt-4"
         >
-          <PhotoGallery photos={data.photos} aspect={data.photoAspect} />
+          {isPortrait ? (
+            <>
+              {/* Mobile: horizontal scroll-snap */}
+              <div className="md:hidden">
+                <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6">
+                  {data.photos.map((p, i) => (
+                    <button
+                      key={`m-${i}`}
+                      type="button"
+                      onClick={() => onOpenLightbox(data.photos, i)}
+                      className="snap-start flex-shrink-0 w-[80vw] aspect-[3/4] rounded-xl overflow-hidden bg-[#1C1C1C]"
+                      aria-label={`Открыть фото ${i + 1}`}
+                    >
+                      <Image
+                        src={p.src}
+                        alt={p.alt}
+                        width={800}
+                        height={1067}
+                        sizes="80vw"
+                        className="object-cover w-full h-full"
+                        draggable={false}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Desktop: masonry */}
+              <div className="hidden md:block">
+                <MasonryGallery
+                  photos={data.photos}
+                  onPhotoClick={(i) => onOpenLightbox(data.photos, i)}
+                />
+              </div>
+            </>
+          ) : (
+            <PhotoGallery
+              photos={data.photos}
+              aspect={data.photoAspect}
+              onPhotoClick={(i) => onOpenLightbox(data.photos, i)}
+            />
+          )}
         </motion.div>
       </div>
 
@@ -529,17 +616,31 @@ function DirectionBlock({
 export default function DirectionsSection() {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeKey, setActiveKey] = useState<DirectionKey | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxPhotos, setLightboxPhotos] = useState<Photo[]>([]);
 
   const openForm = (key: DirectionKey) => {
     setActiveKey(key);
     setModalOpen(true);
   };
 
+  const openLightbox = (photos: Photo[], index: number) => {
+    setLightboxPhotos(photos);
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
   return (
     <>
       <section id="services" className="relative">
         {DATA.map((d) => (
-          <DirectionBlock key={d.key} data={d} onOpenForm={openForm} />
+          <DirectionBlock
+            key={d.key}
+            data={d}
+            onOpenForm={openForm}
+            onOpenLightbox={openLightbox}
+          />
         ))}
       </section>
 
@@ -548,6 +649,14 @@ export default function DirectionsSection() {
         direction={activeKey}
         onClose={() => setModalOpen(false)}
       />
+
+      {lightboxOpen && (
+        <Lightbox
+          photos={lightboxPhotos}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </>
   );
 }

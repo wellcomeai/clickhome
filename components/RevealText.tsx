@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { Fragment, useRef } from 'react';
 import { motion, useInView, Variants } from 'framer-motion';
 
 const wordVariants: Variants = {
@@ -36,20 +36,21 @@ export default function RevealText({
     <div ref={ref}>
       <MotionTag className={className}>
         {words.map((word, i) => (
-          <motion.span
-            key={i}
-            custom={i}
-            variants={wordVariants}
-            initial="hidden"
-            animate={inView ? 'visible' : 'hidden'}
-            style={{
-              display: 'inline-block',
-              marginRight: '0.25em',
-              willChange: 'transform, opacity, filter',
-            }}
-          >
-            {word}
-          </motion.span>
+          <Fragment key={i}>
+            <motion.span
+              custom={i}
+              variants={wordVariants}
+              initial="hidden"
+              animate={inView ? 'visible' : 'hidden'}
+              style={{
+                display: 'inline-block',
+                willChange: 'transform, opacity, filter',
+              }}
+            >
+              {word}
+            </motion.span>
+            {i < words.length - 1 ? ' ' : ''}
+          </Fragment>
         ))}
       </MotionTag>
     </div>
