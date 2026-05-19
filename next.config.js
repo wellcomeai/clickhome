@@ -8,7 +8,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'pub-b1e3de631e544c69b0ad6587f740e140.r2.dev',
+        hostname: 'storage.yandexcloud.net',
       },
     ],
   },

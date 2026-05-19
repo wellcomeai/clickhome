@@ -7,13 +7,19 @@ const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 
 export interface CarouselProps {
   items: { src: string; alt: string }[];
+  className?: string;
+  aspectRatio?: number;
 }
 
-export default function Carousel({ items }: CarouselProps) {
+export default function Carousel({ items, className, aspectRatio }: CarouselProps) {
   const [active, setActive] = useState(0);
-  const [ratio, setRatio] = useState(4 / 3);
+  const [ratio, setRatio] = useState(aspectRatio ?? 4 / 3);
 
   useEffect(() => {
+    if (aspectRatio !== undefined) {
+      setRatio(aspectRatio);
+      return;
+    }
     if (!items[0]) return;
     const img = new window.Image();
     img.src = items[0].src;
@@ -22,7 +28,7 @@ export default function Carousel({ items }: CarouselProps) {
         setRatio(img.naturalWidth / img.naturalHeight);
       }
     };
-  }, [items]);
+  }, [items, aspectRatio]);
 
   const go = (next: number) => {
     if (next < 0 || next >= items.length) return;
@@ -47,7 +53,7 @@ export default function Carousel({ items }: CarouselProps) {
     >
       <motion.div
         onPanEnd={onPanEnd}
-        className="relative mx-auto w-[78vw] md:w-[60vw] max-w-[720px]"
+        className={`relative ${className ?? 'mx-auto w-[78vw] md:w-[60vw] max-w-[720px]'}`}
         style={{ aspectRatio: ratio }}
       >
         {items.map((it, i) => {
